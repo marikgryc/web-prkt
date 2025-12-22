@@ -1,0 +1,65 @@
+.row-container {
+    margin-bottom: 40px;
+    padding-left: 20px;
+    position: relative;
+    z-index: 2; /* Щоб бути вище шуму */
+  }
+  
+  .row-title {
+    color: var(--accent-gold); /* Твій золотий колір */
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: 500;
+    border-left: 4px solid var(--primary-green);
+    padding-left: 10px;
+  }
+  
+  .row-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 20px;
+    /* Приховати скролбар */
+    scrollbar-width: none; 
+  }
+  
+  .row-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .movie-card {
+    min-width: 160px;
+    max-width: 160px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .movie-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .movie-poster {
+    width: 100%;
+    height: 240px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+  
+  .movie-info {
+    margin-top: 8px;
+  }
+  
+  .movie-name {
+    font-size: 0.9rem;
+    color: white;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .movie-rating {
+    font-size: 0.8rem;
+    color: #fbbf24;
+  }

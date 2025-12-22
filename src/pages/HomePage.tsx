@@ -1,47 +1,51 @@
-import React from 'react';
-
-// Тестові дані (поки ми не підключили справжнє API)
-const TEST_MOVIES = [
-  { id: 1, title: "Inception", rating: 8.8, img: "https://image.tmdb.org/t/p/w500/9gk7admal4zlWH9tME55fcae0b6.jpg" },
-  { id: 2, title: "Interstellar", rating: 8.6, img: "https://image.tmdb.org/t/p/w500/gEU2QniL6E8AHtMY4kRFW81i8Wu.jpg" },
-  { id: 3, title: "Dark Knight", rating: 9.0, img: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
-  { id: 4, title: "Avatar", rating: 7.9, img: "https://image.tmdb.org/t/p/w500/kyeqWdyUXW608qlYkRqosgbbJyK.jpg" },
-  { id: 5, title: "Avengers", rating: 8.0, img: "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg" },
-];
+import React, { useEffect, useState } from 'react';
+import MovieRow from '../components/MovieRow';
+import { getTrendingMovies, getNowPlayingMovies, getTopRatedMovies, getUpcomingMovies } from '../api/tmdbApi';
 
 export default function HomePage() {
-  return (
-    <div style={{ padding: '20px 40px' }}>
-      {/* Банер зверху */}
-      <header style={{ marginBottom: 40, textAlign: 'center', padding: '50px 0' }}>
-        <h1 style={{ fontSize: '3rem', margin: 0 }}>Welcome to Leafy</h1>
-        <p style={{ color: '#888', fontSize: '1.2rem' }}>Discover your next favorite movie</p>
-      </header>
+  const [trending, setTrending] = useState([]);
+  const [nowPlaying, setNowPlaying] = useState([]);
+  const [topRated, setTopRated] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
 
-      {/* Секція: Популярне */}
-      <section>
-        <h2 style={{ marginBottom: 20, borderLeft: '4px solid #4ade80', paddingLeft: 10 }}>Trending Now</h2>
-        
-        {/* Горизонтальний скрол */}
-        <div style={{ 
-            display: 'flex', 
-            gap: '20px', 
-            overflowX: 'auto', 
-            paddingBottom: '20px' 
-        }}>
-          {TEST_MOVIES.map((movie) => (
-            <div key={movie.id} style={{ minWidth: '200px', cursor: 'pointer', transition: '0.2s' }}>
-              <img 
-                src={movie.img} 
-                alt={movie.title} 
-                style={{ width: '100%', borderRadius: '12px', boxShadow: '0 5px 15px rgba(0,0,0,0.5)' }} 
-              />
-              <h3 style={{ fontSize: '1rem', marginTop: 10, marginBottom: 5 }}>{movie.title}</h3>
-              <span style={{ color: '#fbbf24' }}>★ {movie.rating}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+  useEffect(() => {
+    const loadData = async () => {
+      // Завантажуємо все паралельно для швидкості
+      const [trendData, nowData, topData, upData] = await Promise.all([
+        getTrendingMovies(),
+        getNowPlayingMovies(),
+        getTopRatedMovies(),
+        getUpcomingMovies()
+      ]);
+
+      setTrending(trendData.results || []);
+      setNowPlaying(nowData.results || []);
+      setTopRated(topData.results || []);
+      setUpcoming(upData.results || []);
+    };
+
+    loadData();
+  }, []);
+
+  return (
+    <div style={{ padding: '20px 0', minHeight: '100vh' }}>
+      
+      {/* Великий заголовок (Hero Section) */}
+      <div style={{ textAlign: 'center', padding: '60px 20px', position: 'relative', zIndex: 2 }}>
+        <h1 style={{ fontSize: '3.5rem', margin: 0, fontWeight: 800 }}>
+          Welcome to <span style={{ color: 'var(--primary-green)' }}>Leafy</span>
+        </h1>
+        <p style={{ color: '#aaa', fontSize: '1.2rem', marginTop: 10 }}>
+          Millions of movies, TV shows and people to discover.
+        </p>
+      </div>
+
+      {/* Рядки з фільмами */}
+      <MovieRow title="Trending Now" movies={trending} />
+      <MovieRow title="Now in Cinemas" movies={nowPlaying} />
+      <MovieRow title="Top Rated" movies={topRated} />
+      <MovieRow title="Upcoming" movies={upcoming} />
+
     </div>
   );
 }
