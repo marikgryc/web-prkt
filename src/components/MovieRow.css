@@ -2,7 +2,7 @@
     margin-bottom: 40px;
     padding-left: 20px;
     position: relative;
-    z-index: 2; /* Щоб бути вище шуму */
+    z-index: 100; /* Щоб бути вище шуму */
   }
   
   .row-title {

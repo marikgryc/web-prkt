@@ -1,0 +1,206 @@
+.movie-page-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 40px;
+    color: white;
+  }
+  
+  /* --- Header --- */
+  .movie-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .movie-title {
+    font-size: 3rem;
+    margin: 0;
+    font-weight: 400; /* Тонший шрифт як в IMDb */
+    letter-spacing: 0.5px;
+  }
+  
+  .movie-meta-line {
+      color: #bbb;
+      margin-top: 5px;
+      font-size: 0.9rem;
+  }
+  
+  .header-right {
+      text-align: right;
+  }
+  
+  .imdb-label {
+      display: block;
+      color: #bbb;
+      font-size: 0.8rem;
+      margin-bottom: 2px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+  }
+  
+  .imdb-score {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+  }
+  
+  .star { color: #f5c518; } /* IMDb Yellow */
+  .score { font-weight: bold; color: white; }
+  .max-score { font-size: 1rem; color: #777; }
+  
+  /* --- Media Grid (3 Columns) --- */
+  .media-grid {
+      display: grid;
+      /* Постер (фікс) | Бекдроп (тягнеться) | Сайдбар (фікс) */
+      grid-template-columns: 280px 1fr 260px; 
+      gap: 10px;
+      height: 400px; /* Фіксуємо висоту блоку медіа */
+      margin-bottom: 20px;
+  }
+  
+  .main-poster {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 2px;
+  }
+  
+  .main-backdrop {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Або contain, якщо хочеш бачити все */
+      background: black;
+  }
+  
+  /* Права колонка з кнопками */
+  .actions-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  }
+  
+  .placeholder-box {
+      background-color: #333;
+      flex: 1; /* Займає вільне місце */
+      border-radius: 2px;
+  }
+  
+  .btn-watchlist {
+      background-color: #2D2D2D; /* Темний фон як в дизайні */
+      color: #5799ef; /* Блакитний текст */
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+  }
+  
+  .btn-watchlist .plus {
+      font-size: 1.4rem;
+      line-height: 0.8;
+  }
+  
+  /* Жовта кнопка з макету (Watchlist) */
+  .btn-watchlist {
+     background-color: #1f1f1f; /* Темний */
+     color: #f5c518; /* Жовтий */
+     position: relative;
+  }
+  /* Або якщо хочеш зелену кнопку як "Add to Watchlist" */
+  .btn-watchlist {
+      background-color: #126e58; /* Зелений з скріна */
+      color: white;
+      text-align: center;
+      justify-content: center;
+  }
+  
+  .btn-recommend {
+      background-color: #3b82f6; /* Синій з скріна */
+      color: white;
+      border: none;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+  }
+  
+  /* --- Details Section --- */
+  .genres-list {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+  }
+  
+  .genre-pill {
+      border: 1px solid #777;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: white;
+      font-weight: 500;
+  }
+  
+  .credits-list {
+      border-top: 1px solid #333;
+      padding-top: 15px;
+  }
+  
+  .credit-row {
+      border-bottom: 1px solid #333;
+      padding: 12px 0;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+  }
+  
+  .credit-label {
+      font-weight: bold;
+      color: white;
+      min-width: 80px;
+  }
+  
+  .credit-value {
+      color: #5799ef; /* Синій колір посилань */
+      cursor: pointer;
+  }
+  
+  .credit-value:hover { text-decoration: underline; }
+  
+  /* --- Photos & Storyline --- */
+  .section-title {
+      color: #f5c518; /* Жовтий заголовок */
+      font-size: 1.8rem;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-left: 4px solid #f5c518;
+      padding-left: 10px;
+      line-height: 1;
+  }
+  
+  .photos-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto; /* Скрол якщо багато фото */
+  }
+  
+  .photos-grid img {
+      height: 180px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+  }
+  
+  .photos-grid img:hover { opacity: 0.8; }
+  
+  .storyline-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #ddd;
+      max-width: 800px;
+  }

@@ -2,15 +2,22 @@
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 
-// --- НАШІ ТЕСТОВІ ДАНІ (MOCK DATA) ---
-// --- ОНОВЛЕНІ ТЕСТОВІ ДАНІ (MOCK DATA) ---
+
 const MOCK_MOVIES = [
   {
     id: 1,
     title: "Dune: Part Two",
     poster_path: "/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+    backdrop_path: "/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg", // Великий кадр
     vote_average: 8.3,
-    overview: "Follow the mythic journey of Paul Atreides..."
+    director: "Denis Villeneuve",
+    writers: "Denis Villeneuve, Jon Spaihts",
+    stars: "Timothée Chalamet, Zendaya, Rebecca Ferguson",
+    genres: ["Sci-Fi", "Adventure", "Drama"],
+    overview: "Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family.",
+    gallery: [
+       "/lzWH9tME55fcae0b6.jpg", "/gEU2QniL6E8AHtMY4kRFW81i8Wu.jpg", "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+    ]
   },
   {
     id: 2,
@@ -27,11 +34,19 @@ const MOCK_MOVIES = [
     overview: "The adventures of a group of explorers..."
   },
   {
-    id: 4,
-    title: "The Dark Knight",
-    poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-    vote_average: 9.0,
-    overview: "Batman raises the stakes in his war on crime."
+    id: 4, // ID має співпадати з тим, що в списку
+    title: "The Shawshank Redemption",
+    poster_path: "/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg", 
+    backdrop_path: "/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg",
+    vote_average: 9.3,
+    director: "Frank Darabont",
+    writers: "Stephen King, Frank Darabont",
+    stars: "Tim Robbins, Morgan Freeman, Bob Gunton",
+    genres: ["Drama", "Crime"],
+    overview: "Chronicles the experiences of a formerly successful banker as a prisoner in the gloomy jailhouse of Shawshank after being found guilty of a crime he did not commit.",
+    gallery: [
+       "/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg", "/v4eWkBBnAnO1x5J67qVf2q1r0fE.jpg", "/avedvodAZUczqh5wEKE72nCN_3.jpg"
+    ]
   },
   {
     id: 5,
