@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Navbar.css'; // Зараз створимо стилі
+import './Navbar.css'; 
 
 export default function Navbar() {
   return (
