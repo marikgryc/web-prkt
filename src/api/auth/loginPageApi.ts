@@ -1,0 +1,64 @@
+import { API_URL } from "@/api/API_CONFIG";
+import { CURRENT_USER } from "@/api/currentUser";
+
+// --- Функція Логіну ---
+export async function LoginRequest(email: string, password: string, navigation: any) {
+  console.log("Trying to login");
+  try {
+    const res = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password,
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.code === 200) {
+      if (data.data && data.data.user) {
+        const user = data.data.user;
+        // Оновлюємо глобальний об'єкт користувача
+        if (CURRENT_USER) {
+            CURRENT_USER.firstName = user.firstName;
+            CURRENT_USER.lastName = user.lastName;
+            CURRENT_USER.username = user.username;
+            CURRENT_USER.UID = user.userID;
+        }
+      }
+      
+      // УВАГА: Для веб-версії (React Router) тут краще використовувати шляхи, наприклад '/'
+      // navigation('/profile') замість navigation.replace("HomePageScreen")
+      // Але поки лишаємо як є, щоб не ламати логіку виклику:
+      if (navigation && typeof navigation.replace === 'function') {
+          navigation.replace("HomePageScreen");
+      } else if (typeof navigation === 'function') {
+          // Якщо ви передали navigate hook з react-router-dom
+          navigation('/'); 
+      }
+    }
+
+    if (data.code === 403) {
+      if (navigation && typeof navigation.navigate === 'function') {
+        navigation.navigate("Error500Screen");
+      }
+    }
+  } catch (error) {
+      console.error("Login error:", error);
+  }
+}
+
+// --- Функція Профілю (Винесена назовні) ---
+export async function getUserProfile() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: 1,
+        name: "Web Developer",
+        email: "admin@leafy.com",
+        avatar: null
+      });
+    }, 1000);
+  });
+}
