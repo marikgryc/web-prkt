@@ -79,13 +79,33 @@ const MOCK_MOVIES = [
   }
 ];
 
-
+const MOCK_ACTOR = {
+  id: 123,
+  name: "Ryan Gosling",
+  birthday: "12 Nov 1980",
+  gender: "Male",
+  rating: 26, // Як на скріні
+  place_of_birth: "London, Ontario, Canada",
+  biography: "Ryan Thomas Gosling (born November 12, 1980) is a Canadian actor. Prominent in independent film, he has also worked in blockbuster films of varying genres, and has accrued a worldwide box office gross of over 1.9 billion USD.",
+  profile_path: "/lyUyVARQFEWGengQSZlFJiA13Wi.jpg", // Фото Райана
+  known_for: [
+    { id: 101, title: "La La Land", poster_path: "/uDO8zWDhfWz7xHrw9monu058SII.jpg" },
+    { id: 102, title: "Blade Runner 2049", poster_path: "/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg" },
+    { id: 103, title: "Drive", poster_path: "/602vevIURmp436YZYvBuP2pOfw6.jpg" },
+    { id: 104, title: "The Notebook", poster_path: "/rNzQyW4f8B8cQeg7Dgj3nZfx5Uy.jpg" },
+    { id: 105, title: "Barbie", poster_path: "/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg" }
+  ]
+};
 export const getTrendingMovies = async () => {
     return new Promise((resolve) => {
         setTimeout(() => resolve({ results: MOCK_MOVIES }), 300);
     });
 };
-
+export const getActorDetails = async (id: number) => {
+  return new Promise((resolve) => {
+      setTimeout(() => resolve(MOCK_ACTOR), 300);
+  });
+};
 export const getNowPlayingMovies = async () => {
     return new Promise((resolve) => {
         setTimeout(() => resolve({ results: [...MOCK_MOVIES].reverse() }), 300);
