@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getMovieDetails, IMAGE_BASE_URL, BACKDROP_BASE_URL } from '../api/tmdbApi';
 import './MoviePage.css';
 
 export default function MoviePage() {
   const { id } = useParams();
   const [movie, setMovie] = useState<any>(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMovieDetails(Number(id));
@@ -82,9 +82,21 @@ export default function MoviePage() {
                 <span className="credit-value link">{movie.writers}</span>
             </div>
             <div className="credit-row">
-                <span className="credit-label">Stars</span>
-                <span className="credit-value link">{movie.stars}</span>
-            </div>
+    <span className="credit-label">Stars</span>
+    <div className="credit-values">
+        {/* Розбиваємо рядок "Actor 1, Actor 2" на масив і малюємо окремо */}
+        {movie.stars.split(', ').map((starName: string, index: number) => (
+            <span 
+                key={index} 
+                className="credit-value link"
+                onClick={() => navigate('/actor/123')} // Тимчасово ведемо всіх на ID 123 (Гослінга)
+                style={{ cursor: 'pointer', color: '#5799ef', marginRight: '5px' }}
+            >
+                {starName}{index < movie.stars.split(', ').length - 1 ? ',' : ''}
+            </span>
+        ))}
+    </div>
+</div>
         </div>
       </section>
 

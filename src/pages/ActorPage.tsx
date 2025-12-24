@@ -5,7 +5,7 @@ import './ActorPage.css';
 
 export default function ActorPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
+
   const [actor, setActor] = useState<any>(null);
 
   useEffect(() => {

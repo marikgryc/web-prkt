@@ -1,0 +1,130 @@
+.actor-page-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    /* Глобальний фон вже заданий в index.css */
+  }
+  
+  /* Центральна картка */
+  .actor-card {
+    background-color: #2b2b2b; /* Темно-сірий фон картки як на скріні */
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 10; /* Щоб бути над шумом */
+  }
+  
+  /* --- Header --- */
+  .actor-header {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  
+  .actor-photo {
+    width: 250px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 4px; /* Легке заокруглення */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  
+  .actor-name {
+    font-size: 2.5rem;
+    margin: 0 0 15px 0;
+    color: white;
+    font-weight: 500;
+  }
+  
+  .btn-follow {
+    background-color: #007f5f; /* Зелений Leafy */
+    color: white;
+    border: none;
+    padding: 8px 40px;
+    border-radius: 20px; /* Овальна форма */
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 40px;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  
+  .btn-follow:hover {
+    background-color: #10b981;
+  }
+  
+  /* --- Info Grid --- */
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .info-row {
+    display: grid;
+    grid-template-columns: 140px 1fr; /* Фіксована ширина для назв */
+    align-items: center;
+  }
+  
+  .label {
+    color: #fca311; /* Жовтий колір (Accent Gold) */
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .value {
+    color: #e5e5e5;
+    font-size: 0.95rem;
+  }
+  
+  /* --- Sections --- */
+  .section-title {
+    color: #fca311; /* Жовтий заголовок */
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: 500;
+    border: none; /* Прибираємо рамки, якщо були */
+    padding: 0;
+  }
+  
+  .bio-text {
+    color: #ccc;
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+  
+  /* --- Known For Grid --- */
+  .known-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .known-item {
+    width: 120px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .known-item img {
+    width: 100%;
+    border-radius: 8px;
+    transition: transform 0.2s;
+    margin-bottom: 8px;
+  }
+  
+  .known-item img:hover {
+    transform: scale(1.05);
+  }
+  
+  .known-title {
+    color: #fca311; /* Жовтий колір для назв фільмів */
+    font-size: 0.85rem;
+    display: block;
+    line-height: 1.2;
+  }
