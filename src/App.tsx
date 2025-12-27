@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import MoviePage from './pages/MoviePage';
 import ActorPage from './pages/ActorPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 function App() {
   return (
     <BrowserRouter>
@@ -13,6 +15,7 @@ function App() {
         <Route path="/movie/:id" element={<MoviePage />} />
         <Route path="/actor/:id" element={<ActorPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage/>} />
       </Routes>
     </BrowserRouter>
   );
