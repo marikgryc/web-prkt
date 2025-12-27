@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Тут буде логіка входу через API
-    navigate('/'); // Поки просто перекидаємо на головну
+    
+    if (email.trim().length > 0) {
+        login(email, "Movie Fan"); 
+        navigate('/profile'); 
+    } else {
+        alert("Please enter email");
+    }
   };
 
   return (
