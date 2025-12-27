@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import MovieRow from '../components/MovieRow';
-import { getTrendingMovies, getNowPlayingMovies, getTopRatedMovies, getUpcomingMovies } from '../api/tmdbApi';
+import { 
+    getTrendingMovies, 
+    getNowPlayingMovies, 
+    getTopRatedMovies, 
+    getUpcomingMovies, 
+    BACKDROP_BASE_URL 
+} from '../api/tmdbApi';
+import './HomePage.css'; 
 
 export default function HomePage() {
-  const [trending, setTrending] = useState([]);
-  const [nowPlaying, setNowPlaying] = useState([]);
-  const [topRated, setTopRated] = useState([]);
-  const [upcoming, setUpcoming] = useState([]);
+  const [trending, setTrending] = useState<any[]>([]);
+  const [nowPlaying, setNowPlaying] = useState<any[]>([]);
+  const [topRated, setTopRated] = useState<any[]>([]);
+  const [upcoming, setUpcoming] = useState<any[]>([]);
+  
+  const [heroMovie, setHeroMovie] = useState<any>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -21,29 +30,58 @@ export default function HomePage() {
       setNowPlaying(nowData.results || []);
       setTopRated(topData.results || []);
       setUpcoming(upData.results || []);
+
+      if (trendData.results && trendData.results.length > 0) {
+        const moviesWithBackdrop = trendData.results.filter((m: any) => m.backdrop_path);
+        const candidates = moviesWithBackdrop.length > 0 ? moviesWithBackdrop : trendData.results;
+        const random = candidates[Math.floor(Math.random() * candidates.length)];
+        setHeroMovie(random);
+      }
     };
 
     loadData();
   }, []);
 
-  return (
-    <div style={{ padding: '20px 0', minHeight: '100vh' }}>
-      
-      
-      <div style={{ textAlign: 'center', padding: '60px 20px', position: 'relative', zIndex: 2 }}>
-        <h1 style={{ fontSize: '3.5rem', margin: 0, fontWeight: 800 }}>
-          Welcome to <span style={{ color: 'var(--primary-green)' }}>Cinelink</span>
-        </h1>
-        <p style={{ color: '#aaa', fontSize: '1.2rem', marginTop: 10 }}>
-          Millions of movies, TV shows and people to discover.
-        </p>
-      </div>
+  const truncate = (str: string, n: number) => {
+      return str?.length > n ? str.substr(0, n - 1) + "..." : str;
+  };
 
-      {/* Рядки з фільмами */}
-      <MovieRow title="Trending Now" movies={trending} />
-      <MovieRow title="Now in Cinemas" movies={nowPlaying} />
-      <MovieRow title="Top Rated" movies={topRated} />
-      <MovieRow title="Upcoming" movies={upcoming} />
+  return (
+    <div className="home-container">
+      
+    
+      {heroMovie && (
+          <header 
+            className="banner"
+            style={{
+                backgroundImage: `url("${BACKDROP_BASE_URL}${heroMovie.backdrop_path || heroMovie.poster_path}")`,
+            }}
+          >
+              <div className="banner-contents">
+                  <h1 className="banner-title">
+                      {heroMovie.title || heroMovie.name || heroMovie.original_name}
+                  </h1>
+
+                  <div className="banner-buttons">
+                      <button className="banner-button btn-play">Play</button>
+                      <button className="banner-button">More Info</button>
+                  </div>
+
+                  <h1 className="banner-description">
+                      {truncate(heroMovie.overview, 150)}
+                  </h1>
+              </div>
+
+              <div className="banner-fadeBottom" />
+          </header>
+      )}
+
+      <div style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
+        <MovieRow title="Trending Now" movies={trending} />
+        <MovieRow title="Now in Cinemas" movies={nowPlaying} />
+        <MovieRow title="Top Rated" movies={topRated} />
+        <MovieRow title="Upcoming" movies={upcoming} />
+      </div>
 
     </div>
   );
