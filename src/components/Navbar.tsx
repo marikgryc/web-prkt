@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Navbar.css'; // 👈 ОБОВ'ЯЗКОВО МАЄ БУТИ ЦЕЙ РЯДОК!
+import './Navbar.css'; 
+import logo from '../assets/Logo.png';
 
 export default function Navbar() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth(); // (прибрав user, якщо не використовуєш)
+  const { isAuthenticated } = useAuth(); 
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,10 +26,13 @@ export default function Navbar() {
       <div className="nav-contents">
         
         {/* Логотип */}
-        <Link to="/" className="nav-logo">
-           Cinelink
+        <Link to="/">
+           <img 
+             src={logo} 
+             alt="Cinelink" 
+             className="nav-logo" 
+           />
         </Link>
-
         <div className="nav-links">
            <Link to="/">Home</Link>
            {isAuthenticated && <Link to="/profile">My List</Link>}

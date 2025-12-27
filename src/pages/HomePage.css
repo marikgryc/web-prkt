@@ -1,5 +1,3 @@
-/* src/pages/HomePage.css */
-
 .home-container {
     background-color: #111;
     min-height: 100vh;
@@ -9,12 +7,12 @@
   .banner {
     color: white;
     object-fit: contain;
-    height: 448px; /* Висота банера */
+    height: 448px; 
     background-size: cover;
     background-position: center center;
     position: relative;
     margin-bottom: 20px;
-    background-color: #1a1a1a;
+    background-color: #111111;
   }
   
   .banner-contents {
@@ -39,14 +37,12 @@
     max-width: 360px;
     height: 80px;
     color: #ddd;
-    /* Обрізка тексту ... */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   
-  /* Кнопки на банері */
   .banner-buttons {
       margin-top: 20px;
   }
