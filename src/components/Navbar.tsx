@@ -8,7 +8,7 @@ export default function Navbar() {
       <div className="navbar-container">
         {/* Логотип */}
         <Link to="/" className="navbar-logo">
-          Leafy <span style={{ color: '#4ade80' }}>.</span>
+          Cinelink <span style={{ color: '#4ade80' }}>.</span>
         </Link>
 
         {/* Меню */}

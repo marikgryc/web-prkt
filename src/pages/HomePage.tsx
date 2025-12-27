@@ -10,7 +10,6 @@ export default function HomePage() {
 
   useEffect(() => {
     const loadData = async () => {
-      // Завантажуємо все паралельно для швидкості
       const [trendData, nowData, topData, upData] = await Promise.all([
         getTrendingMovies(),
         getNowPlayingMovies(),
@@ -30,10 +29,10 @@ export default function HomePage() {
   return (
     <div style={{ padding: '20px 0', minHeight: '100vh' }}>
       
-      {/* Великий заголовок (Hero Section) */}
+      {/*(Hero Section)*/}
       <div style={{ textAlign: 'center', padding: '60px 20px', position: 'relative', zIndex: 2 }}>
         <h1 style={{ fontSize: '3.5rem', margin: 0, fontWeight: 800 }}>
-          Welcome to <span style={{ color: 'var(--primary-green)' }}>Leafy</span>
+          Welcome to <span style={{ color: 'var(--primary-green)' }}>Cinelink</span>
         </h1>
         <p style={{ color: '#aaa', fontSize: '1.2rem', marginTop: 10 }}>
           Millions of movies, TV shows and people to discover.
