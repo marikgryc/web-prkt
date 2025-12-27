@@ -18,10 +18,8 @@ export default function Navbar() {
           <Link to="/profile" className="nav-link">Profile</Link>
         </div>
 
-        {/* Аватарка (заглушка) */}
-        <Link to="/profile" className="navbar-profile">
-          <div className="avatar-circle">U</div>
-        </Link>
+        <Link to="/login" className="nav-linl">Login</Link>
+
       </div>
     </nav>
   );

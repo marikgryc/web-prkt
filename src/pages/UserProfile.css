@@ -1,10 +1,9 @@
-/* Це звичайний CSS, який працює у всіх браузерах */
 .profile-container {
     display: flex;
     justify_content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #121212; /* Темна тема */
+    background-color: #121212; 
     color: white;
   }
   
@@ -14,7 +13,7 @@
     border-radius: 16px;
     text-align: center;
     width: 100%;
-    max-width: 400px; /* Обмеження ширини для ПК */
+    max-width: 400px; 
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
   

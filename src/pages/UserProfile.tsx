@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-// Імпортуємо ваш API (переконайтеся, що шлях правильний)
 import { getUserProfile } from '../api/auth/loginPageApi'; 
-import './UserProfile.css'; // Створимо цей файл стилів нижче
+import './UserProfile.css';
 
 export default function UserProfile() {
   const [user, setUser] = useState<any>(null);
