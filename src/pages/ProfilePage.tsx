@@ -17,9 +17,7 @@ export default function ProfilePage() {
       return <div className="loading-text">Loading user info...</div>;
   }
 
-  // Обробка посилань (якщо null — ставимо заглушку або пустий рядок)
   const avatarUrl = user.avatar_url || "https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png";
-  // Якщо немає обкладинки, буде просто градієнт (в CSS)
   const bgUrl = user.bg_img_url; 
 
   const joinDate = user.created_at 
@@ -29,11 +27,9 @@ export default function ProfilePage() {
   return (
     <div className="profile-page">
       
-      {/* 1. ОБКЛАДИНКА ПРОФІЛЮ (Background Image) */}
       <div 
         className="profile-cover" 
         style={{
-           // Якщо є картинка — ставимо її, якщо ні — градієнт з CSS
            backgroundImage: bgUrl ? `url(${bgUrl})` : undefined 
         }}
       ></div>
