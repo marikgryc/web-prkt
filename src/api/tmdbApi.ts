@@ -13,6 +13,7 @@ export interface User {
   followers?: number;
   followings?: number;
   created_at?: string;
+  bg_img_url?:		string;
 }
 
 export interface Movie {
@@ -89,10 +90,20 @@ export const getTopRatedMovies = getPopularMovies;
 export const getUpcomingMovies = getPopularMovies;
 
 export const getMovieDetails = async (id: number) => {
-    const popular = await getPopularMovies();
-    return popular.results.find((m: Movie) => m.id === Number(id)) || MOCK_MOVIES[0];
+  const response = await tmdbClient.get(`/movie/${id}`, {
+      params: {
+          append_to_response: 'credits,videos,similar'
+      }
+  });
+  return response.data;
 };
-
+export const getImageUrl = (path: string | null, size: string = 'w500') => {
+  if (!path) {
+    // Повертаємо заглушку, якщо картинки немає
+    return 'https://via.placeholder.com/500x750?text=No+Image'; 
+  }
+  return `https://image.tmdb.org/t/p/${size}${path}`;
+};
 export const getActorDetails = async (id: number) => {
     return { id, name: "Actor Info Unavailable", biography: "", profile_path: null, known_for: [] };
 };

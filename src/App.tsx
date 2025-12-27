@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { AnimatePresence } from 'framer-motion';
-
 import HomePage from './pages/HomePage';
 import MoviePage from './pages/MoviePage';
 import ActorPage from './pages/ActorPage';
@@ -10,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
+
 
 function App() {
   return (

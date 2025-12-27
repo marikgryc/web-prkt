@@ -201,4 +201,34 @@
       color: #ddd;
       max-width: 800px;
   }
-  
+  .recommendations-section {
+    margin-top: 40px;
+    padding-bottom: 40px;
+}
+
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.rec-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.rec-card:hover {
+    transform: scale(1.05);
+}
+
+.rec-card img {
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.rec-card p {
+    font-size: 0.9rem;
+    color: #ddd;
+    margin: 0;
+}

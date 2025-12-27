@@ -1,206 +1,185 @@
-/* Основний контейнер профілю */
+/* Основний фон сторінки */
 .profile-page {
     background-color: #121212;
     min-height: 100vh;
-    padding-top: 100px; /* Відступ від навбару */
-    padding-left: 5%;
-    padding-right: 5%;
     color: white;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  /* --- ВЕРХНЯ ЧАСТИНА (Header) --- */
-  .profile-header {
+    /* Прибираємо глобальний padding-top, бо тепер у нас є обкладинка */
+    padding-bottom: 50px;
+}
+
+/* --- ОБКЛАДИНКА (Background Image) --- */
+.profile-cover {
+    width: 100%;
+    height: 250px; /* Висота шапки */
+    background: linear-gradient(45deg, #232526, #414345); /* Дефолтний фон */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* Контейнер для центрування вмісту (щоб не розлазилось на широких екранах) */
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- ШАПКА ПРОФІЛЮ --- */
+.profile-header {
     display: flex;
+    flex-direction: column; /* На мобільних - вертикально */
     align-items: flex-start;
-    gap: 30px;
-    margin-bottom: 50px;
-  }
-  
-  .profile-avatar-large {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+/* Аватарка */
+.profile-avatar-large {
     width: 140px;
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #2a2a2a;
-  }
-  
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-    padding-top: 10px;
-  }
-  
-  .profile-name {
-    font-size: 2.5rem;
-    font-weight: 600;
+    border: 5px solid #121212; /* Рамка кольору фону сторінки */
+    /* ВАЖЛИВО: піднімаємо аватарку вгору на обкладинку */
+    margin-top: -70px; 
+    z-index: 2;
+}
+
+.profile-info {
+    margin-top: 15px;
+    width: 100%;
+}
+
+.profile-names {
+    margin-bottom: 10px;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 700;
     margin: 0;
     line-height: 1.1;
-  }
-  
-  .profile-handle {
+}
+
+.profile-handle {
     color: #888;
     font-size: 1rem;
-    margin: 5px 0;
-  }
-  
-  .profile-joined {
+    margin: 2px 0 0 0;
+}
+
+/* --- БІОГРАФІЯ --- */
+.profile-bio {
+    font-size: 1rem;
+    color: #ddd;
+    margin-bottom: 15px;
+    max-width: 600px; /* Щоб текст не був занадто широким */
+    line-height: 1.5;
+    white-space: pre-wrap; /* Зберігає переноси рядків */
+}
+
+.profile-joined {
+    display: block;
     color: #555;
-    font-size: 0.8rem;
-    margin-bottom: 15px;
-  }
-  
-  /* Блоки статистики (Following, Followers) */
-  .profile-stats-row {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+/* Статистика */
+.profile-stats-row {
     display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-  
-  .stat-box {
-    background: #1f1f1f;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.stat-box {
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.stat-box strong {
+    color: white;
+    font-weight: 700;
+}
+
+/* Кнопка виходу */
+.logout-btn {
     border: 1px solid #333;
     padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #ccc;
+    border-radius: 20px;
     cursor: pointer;
     transition: 0.2s;
-  }
-  
-  .stat-box:hover {
-    background: #333;
-    border-color: #555;
-  }
-  
-  /* Жанри */
-  .top-genres {
+    margin-left: auto; /* Притискає кнопку вправо */
+    color: #ff4d4d;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background-color: #330000;
+    border-color: #ff4d4d;
+}
+
+/* --- ВКЛАДКИ --- */
+.profile-tabs {
     display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .genre-label {
-    color: #888;
-    font-size: 0.9rem;
-    margin-right: 5px;
-  }
-  
-  .genre-tag {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  
-  .genre-drama { background-color: #004d40; color: #4db6ac; } /* Темно-зелений */
-  .genre-action { background-color: #4a0000; color: #ef5350; } /* Темно-червоний */
-  
-  /* --- ВКЛАДКИ (Tabs) --- */
-  .profile-tabs {
-    display: flex;
-    gap: 40px;
+    gap: 30px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
     margin-bottom: 30px;
-    border-bottom: 1px solid #222;
-    padding-bottom: 15px;
-  }
-  
-  .tab-item {
-    font-size: 1.4rem;
-    color: #666;
-    cursor: pointer;
+}
+
+.tab-item {
     background: none;
     border: none;
-    padding: 0;
-    transition: 0.3s;
-  }
-  
-  .tab-item.active {
-    color: white;
-    font-weight: 500;
-  }
-  
-  .tab-item:hover {
-    color: #aaa;
-  }
-  
-  /* --- СТРІЧКА ПОСТІВ (Posts) --- */
-  .posts-section {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    max-width: 600px; /* Обмежуємо ширину, як у соцмережах */
-  }
-  
-  .post-card {
-    background: transparent;
-    padding-bottom: 20px;
-  }
-  
-  .post-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .post-avatar-small {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .post-author-name {
-    font-weight: 700;
-    color: #ddd;
     font-size: 1rem;
-  }
-  
-  .post-author-handle {
-    font-weight: 400;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .post-image {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #222;
-  }
-  
-  /* Дії під постом (Коментар, Лайк) */
-  .post-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .comment-input {
-    background: #222;
-    border: 1px solid #333;
-    padding: 10px 15px;
-    border-radius: 6px;
-    color: white;
-    flex-grow: 1;
-    font-size: 0.9rem;
-    outline: none;
-  }
-  
-  .comment-input:focus {
-    border-color: #444;
-  }
-  
-  .action-icon {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-weight: 500;
     color: #888;
     cursor: pointer;
-    font-size: 0.9rem;
-  }
-  
-  .action-icon:hover { color: white; }
-  .icon-heart { color: #e50914; } 
+    padding-bottom: 5px;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.tab-item.active {
+    color: white;
+}
+
+/* Лінія під активною вкладкою */
+.tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #4ade80; /* Зелений акцент */
+    border-radius: 2px;
+}
+
+.loading-text {
+    color: white;
+    text-align: center;
+    padding-top: 100px;
+}
+
+/* Адаптивність для планшетів та ПК */
+@media (min-width: 768px) {
+    .profile-header {
+        flex-direction: row; /* Аватар зліва, інфо справа (якщо хочеш такий стиль) */
+        align-items: flex-end; /* Вирівнювання по низу */
+        gap: 30px;
+    }
+    
+    .profile-avatar-large {
+        margin-top: -100px; /* Більший підйом на великих екранах */
+        width: 180px;
+        height: 180px;
+    }
+    
+    .profile-info {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+}
