@@ -1,0 +1,206 @@
+/* Основний контейнер профілю */
+.profile-page {
+    background-color: #121212;
+    min-height: 100vh;
+    padding-top: 100px; /* Відступ від навбару */
+    padding-left: 5%;
+    padding-right: 5%;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* --- ВЕРХНЯ ЧАСТИНА (Header) --- */
+  .profile-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+  
+  .profile-avatar-large {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #2a2a2a;
+  }
+  
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+  }
+  
+  .profile-name {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.1;
+  }
+  
+  .profile-handle {
+    color: #888;
+    font-size: 1rem;
+    margin: 5px 0;
+  }
+  
+  .profile-joined {
+    color: #555;
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+  }
+  
+  /* Блоки статистики (Following, Followers) */
+  .profile-stats-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .stat-box {
+    background: #1f1f1f;
+    border: 1px solid #333;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .stat-box:hover {
+    background: #333;
+    border-color: #555;
+  }
+  
+  /* Жанри */
+  .top-genres {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .genre-label {
+    color: #888;
+    font-size: 0.9rem;
+    margin-right: 5px;
+  }
+  
+  .genre-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  
+  .genre-drama { background-color: #004d40; color: #4db6ac; } /* Темно-зелений */
+  .genre-action { background-color: #4a0000; color: #ef5350; } /* Темно-червоний */
+  
+  /* --- ВКЛАДКИ (Tabs) --- */
+  .profile-tabs {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 15px;
+  }
+  
+  .tab-item {
+    font-size: 1.4rem;
+    color: #666;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: 0.3s;
+  }
+  
+  .tab-item.active {
+    color: white;
+    font-weight: 500;
+  }
+  
+  .tab-item:hover {
+    color: #aaa;
+  }
+  
+  /* --- СТРІЧКА ПОСТІВ (Posts) --- */
+  .posts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 600px; /* Обмежуємо ширину, як у соцмережах */
+  }
+  
+  .post-card {
+    background: transparent;
+    padding-bottom: 20px;
+  }
+  
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .post-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .post-author-name {
+    font-weight: 700;
+    color: #ddd;
+    font-size: 1rem;
+  }
+  
+  .post-author-handle {
+    font-weight: 400;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .post-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #222;
+  }
+  
+  /* Дії під постом (Коментар, Лайк) */
+  .post-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .comment-input {
+    background: #222;
+    border: 1px solid #333;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: white;
+    flex-grow: 1;
+    font-size: 0.9rem;
+    outline: none;
+  }
+  
+  .comment-input:focus {
+    border-color: #444;
+  }
+  
+  .action-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .action-icon:hover { color: white; }
+  .icon-heart { color: #e50914; } 
