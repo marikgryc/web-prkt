@@ -302,7 +302,6 @@
 .actor-character {
     font-size: 1.5rem;
     color: #888;
-    /* Обрізаємо довгі імена персонажів */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
