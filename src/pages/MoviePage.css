@@ -233,3 +233,77 @@
     color: #ddd;
     margin: 0;
 }
+.cast-scroller {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 20px; /* Місце для скролбару */
+    scrollbar-width: thin; /* Для Firefox */
+    scrollbar-color: #555 #222;
+}
+
+/* Стилізація скролбару для Chrome/Safari */
+.cast-scroller::-webkit-scrollbar {
+    height: 8px;
+}
+.cast-scroller::-webkit-scrollbar-track {
+    background: #222;
+}
+.cast-scroller::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+/* Картка актора */
+.cast-card {
+    flex: 0 0 140px; /* Фіксована ширина картки */
+    background-color: #1f1f1f; /* Трохи світліше за фон сторінки */
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.cast-img-wrapper {
+    width: 100%;
+    height: 175px;
+    background-color: #333;
+}
+
+.cast-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-photo {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 0.8rem;
+}
+
+.cast-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.actor-name {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.actor-character {
+    font-size: 1.5rem;
+    color: #888;
+    /* Обрізаємо довгі імена персонажів */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -5,9 +5,27 @@ import {
     getNowPlayingMovies, 
     getTopRatedMovies, 
     getUpcomingMovies, 
-    BACKDROP_BASE_URL 
+    getImageUrl,
+    // Переконайся, що Movie експортується з api/tmdbApi.ts, 
+    // або розкоментуй інтерфейс нижче
+    // Movie 
 } from '../api/tmdbApi';
 import './HomePage.css'; 
+
+// Якщо Movie не експортується з api файлу, розкоментуй це:
+/*
+interface Movie {
+  id: number;
+  poster_path: string;
+  backdrop_path?: string;
+  title: string;
+  overview?: string;
+  vote_average: number;
+}
+*/
+
+// Або використовуй any, якщо ліньки типізувати зараз:
+// type Movie = any; 
 
 export default function HomePage() {
   const [trending, setTrending] = useState<any[]>([]);
@@ -15,51 +33,60 @@ export default function HomePage() {
   const [topRated, setTopRated] = useState<any[]>([]);
   const [upcoming, setUpcoming] = useState<any[]>([]);
   
-  const [heroMovie, setHeroMovie] = useState<any>(null);
+  const [heroMovie, setHeroMovie] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      const [trendData, nowData, topData, upData] = await Promise.all([
-        getTrendingMovies(),
-        getNowPlayingMovies(),
-        getTopRatedMovies(),
-        getUpcomingMovies()
-      ]);
+      try {
+        // Виконуємо всі запити паралельно через твої функції
+        const [trendData, nowData, topData, upData] = await Promise.all([
+            getTrendingMovies(),
+            getNowPlayingMovies(),
+            getTopRatedMovies(),
+            getUpcomingMovies()
+        ]);
 
-      setTrending(trendData.results || []);
-      setNowPlaying(nowData.results || []);
-      setTopRated(topData.results || []);
-      setUpcoming(upData.results || []);
+        setTrending(trendData.results || []);
+        setNowPlaying(nowData.results || []);
+        setTopRated(topData.results || []);
+        setUpcoming(upData.results || []);
 
-      if (trendData.results && trendData.results.length > 0) {
-        const moviesWithBackdrop = trendData.results.filter((m: any) => m.backdrop_path);
-        const candidates = moviesWithBackdrop.length > 0 ? moviesWithBackdrop : trendData.results;
-        const random = candidates[Math.floor(Math.random() * candidates.length)];
-        setHeroMovie(random);
+        // Вибираємо випадковий фільм для банера
+        const allMovies = nowData.results || [];
+        if (allMovies.length > 0) {
+            const random = allMovies[Math.floor(Math.random() * allMovies.length)];
+            setHeroMovie(random);
+        }
+
+      } catch (err) {
+          console.error("Error loading home page data", err);
+      } finally {
+          setLoading(false);
       }
     };
 
     loadData();
   }, []);
 
-  const truncate = (str: string, n: number) => {
-      return str?.length > n ? str.substr(0, n - 1) + "..." : str;
-  };
+  if (loading) return <div className="home-loader">Loading...</div>;
 
   return (
     <div className="home-container">
       
-    
+      {/* HERO BANNER */}
       {heroMovie && (
           <header 
             className="banner"
             style={{
-                backgroundImage: `url("${BACKDROP_BASE_URL}${heroMovie.backdrop_path || heroMovie.poster_path}")`,
+                backgroundImage: `url("${getImageUrl(heroMovie.backdrop_path || heroMovie.poster_path, 'original')}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center top',
             }}
           >
               <div className="banner-contents">
                   <h1 className="banner-title">
-                      {heroMovie.title || heroMovie.name || heroMovie.original_name}
+                      {heroMovie.title}
                   </h1>
 
                   <div className="banner-buttons">
@@ -67,22 +94,23 @@ export default function HomePage() {
                       <button className="banner-button">More Info</button>
                   </div>
 
-                  <h1 className="banner-description">
-                      {truncate(heroMovie.overview, 150)}
-                  </h1>
+                  {heroMovie.overview && (
+                      <h1 className="banner-description">
+                          {heroMovie.overview}
+                      </h1>
+                  )}
               </div>
-
               <div className="banner-fadeBottom" />
           </header>
       )}
 
+      {/* РЯДКИ ФІЛЬМІВ */}
       <div style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
-        <MovieRow title="Trending Now" movies={trending} />
-        <MovieRow title="Now in Cinemas" movies={nowPlaying} />
-        <MovieRow title="Top Rated" movies={topRated} />
-        <MovieRow title="Upcoming" movies={upcoming} />
+        {trending.length > 0 && <MovieRow title="Trending Now" movies={trending} />}
+        {nowPlaying.length > 0 && <MovieRow title="Now in Cinemas" movies={nowPlaying} />}
+        {topRated.length > 0 && <MovieRow title="Top Rated" movies={topRated} />}
+        {upcoming.length > 0 && <MovieRow title="Upcoming" movies={upcoming} />}
       </div>
-
     </div>
   );
 }

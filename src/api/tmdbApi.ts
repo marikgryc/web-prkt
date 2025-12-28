@@ -1,7 +1,25 @@
-import axiosClient from './axiosClient';
+import axios from 'axios'; // 1. Додали імпорт самої бібліотеки
 
+// 2. Визначаємо константи (встав сюди свій ключ!)
+export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43'; 
+export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
+
+// Тимчасова заглушка для MOCK_MOVIES, щоб код не падав, якщо ти їх видалив
+const MOCK_MOVIES: Movie[] = []; 
+
+// 3. Створюємо налаштований клієнт
+// (Ми прибрали import axiosClient з початку файлу, бо створюємо його тут)
+const axiosClient = axios.create({
+    baseURL: BASE_URL,
+    params: {
+        api_key: API_KEY,
+        language: 'uk-UA', // Мова інтерфейсу
+    }
+});
+
+// --- ТИПИ ДАНИХ ---
 export interface User {
   user_id: number;
   username: string;
@@ -13,20 +31,30 @@ export interface User {
   followers?: number;
   followings?: number;
   created_at?: string;
-  bg_img_url?:		string;
+  bg_img_url?: string;
 }
 
 export interface Movie {
-  id: number;
-  title: string;
-  vote_average: number;
-  poster_path: string;
-  backdrop_path?: string;
-  overview?: string;
-  release_date?: string;
+    id: number;
+    title: string;
+    poster_path: string;
+    backdrop_path?: string;
+    overview?: string;
+    vote_average: number;
+    release_date?: string;
+}
+  
+export interface MovieResponse {
+    page: number;
+    results: Movie[];
+    total_pages: number;
+    total_results: number;
 }
 
 // --- API ЗАПИТИ ---
+
+// УВАГА: Цей запит (/login) не спрацює з API TMDB. 
+// Це для твого власного бекенду. Якщо бекенду немає, закоментуй це.
 export const loginUser = async (loginData: { login: string; password: string }) => {
     try {
         const response = await axiosClient.post('/login', loginData);
@@ -39,7 +67,7 @@ export const loginUser = async (loginData: { login: string; password: string }) 
     }
 };
 
-// 2. ПРОФІЛЬ
+// Це теж для власного бекенду (/users/id)
 export const getUserProfile = async (id: number) => {
     try {
         const response = await axiosClient.get(`/users/${id}`);
@@ -50,69 +78,81 @@ export const getUserProfile = async (id: number) => {
     }
 };
 
+// Це комбінована функція. Для чистого TMDB краще використовувати getTrendingMovies
 export const getPopularMovies = async () => {
     try {
-        console.log("📡 Стукаємо за фільмами на: /movies/popular");
-        const response = await axiosClient.get('/movies/popular');
+        console.log("📡 Стукаємо за фільмами (TMDB): /movie/popular");
+        // Виправлено шлях: у TMDB це /movie/popular (однина), а не /movies
+        const response = await axiosClient.get('/movie/popular'); 
         
         console.log("✅ Відповідь сервера фільмів:", response.data); 
 
-        const serverData = response.data.result || response.data.results;
+        const serverData = response.data.results; // TMDB повертає results
 
         if (Array.isArray(serverData) && serverData.length > 0) {
-            console.log("🎬 Знайдено фільми на сервері!");
             return { results: serverData };
-        } else if (serverData && !Array.isArray(serverData)) {
-             return { results: [serverData] };
-        }
-        console.warn("⚠️ Сервер дав пустий список. Показуємо MOCK_MOVIES.");
+        } 
+        
+        console.warn("⚠️ Сервер дав пустий список.");
         return { results: MOCK_MOVIES };
 
     } catch (error) {
-        console.error("❌ Помилка API фільмів (або 404). Використовуємо MOCK_MOVIES.", error);
+        console.error("❌ Помилка API фільмів. Використовуємо MOCK_MOVIES.", error);
         return { results: MOCK_MOVIES };
     }
 };
 
 export const getGenres = async () => {
     try {
-        const response = await axiosClient.get('/movies/genres');
+        const response = await axiosClient.get('/genre/movie/list'); // Виправлено шлях для TMDB
         return response.data;
     } catch (error) {
         return { genres: [] };
     }
 };
 
-// Аліаси
-export const getTrendingMovies = getPopularMovies; 
-export const getNowPlayingMovies = getPopularMovies;
-export const getTopRatedMovies = getPopularMovies;
-export const getUpcomingMovies = getPopularMovies;
+// --- ФУНКЦІЇ ДЛЯ TMDB (Головна сторінка) ---
 
 export const getMovieDetails = async (id: number) => {
     console.log(`📡 Запит деталів фільму ID: ${id}`);
-    
-    // Виконуємо запит
-    const response = await axiosClient.get(`/movies/${id}`);
-    
-    console.log("✅ Відповідь сервера (Details):", response.data);
+    const response = await axiosClient.get(`/movie/${id}`); // Виправлено шлях: /movie/{id}
+    return response.data;
+};
+
+export const getTrendingMovies = async () => {
+    const response = await axiosClient.get<MovieResponse>('/trending/movie/week');
+    return response.data;
+};
   
-    // Перевіряємо різні варіанти, де можуть лежати дані
-    const data = response.data.result || response.data.results || response.data;
+export const getNowPlayingMovies = async () => {
+    const response = await axiosClient.get<MovieResponse>('/movie/now_playing');
+    return response.data;
+};
   
-    if (!data) {
-       console.warn("⚠️ Сервер повернув відповідь, але даних про фільм не знайдено (data is null/undefined)");
-    }
+export const getTopRatedMovies = async () => {
+    const response = await axiosClient.get<MovieResponse>('/movie/top_rated');
+    return response.data;
+};
   
-    return data;
-  };
-export const getImageUrl = (path: string | null, size: string = 'w500') => {
+export const getUpcomingMovies = async () => {
+    const response = await axiosClient.get<MovieResponse>('/movie/upcoming');
+    return response.data;
+};
+
+// Допоміжна функція картинок
+export const getImageUrl = (path: string | null | undefined, size: string = 'w500') => {
   if (!path) {
-  
     return 'https://via.placeholder.com/500x750?text=No+Image'; 
   }
   return `https://image.tmdb.org/t/p/${size}${path}`;
 };
+export const getMovieCredits = async (id: number) => {
+    // Залежно від того, як у вас налаштований axios, шлях може трохи відрізнятися
+    // Але зазвичай це: /movie/{id}/credits
+    const response = await axiosClient.get(`/movie/${id}/credits`); 
+    return response.data.cast;
+  };
 export const getActorDetails = async (id: number) => {
+    // Поки заглушка, пізніше можна зробити запит /person/{id}
     return { id, name: "Actor Info Unavailable", biography: "", profile_path: null, known_for: [] };
 };
