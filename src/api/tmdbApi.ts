@@ -90,16 +90,25 @@ export const getTopRatedMovies = getPopularMovies;
 export const getUpcomingMovies = getPopularMovies;
 
 export const getMovieDetails = async (id: number) => {
-  const response = await tmdbClient.get(`/movie/${id}`, {
-      params: {
-          append_to_response: 'credits,videos,similar'
-      }
-  });
-  return response.data;
-};
+    console.log(`📡 Запит деталів фільму ID: ${id}`);
+    
+    // Виконуємо запит
+    const response = await axiosClient.get(`/movies/${id}`);
+    
+    console.log("✅ Відповідь сервера (Details):", response.data);
+  
+    // Перевіряємо різні варіанти, де можуть лежати дані
+    const data = response.data.result || response.data.results || response.data;
+  
+    if (!data) {
+       console.warn("⚠️ Сервер повернув відповідь, але даних про фільм не знайдено (data is null/undefined)");
+    }
+  
+    return data;
+  };
 export const getImageUrl = (path: string | null, size: string = 'w500') => {
   if (!path) {
-    // Повертаємо заглушку, якщо картинки немає
+  
     return 'https://via.placeholder.com/500x750?text=No+Image'; 
   }
   return `https://image.tmdb.org/t/p/${size}${path}`;
