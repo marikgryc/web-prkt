@@ -9,7 +9,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
-
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -27,6 +27,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </AnimatePresence>
+      <Footer />
     </div>
   );
 }

@@ -1,0 +1,127 @@
+/* Основний контейнер футера */
+.site-footer {
+    background-color: #121212; /* Темний фон, як на сторінці профілю */
+    color: #ffffff;
+    padding: 60px 0 20px;
+    border-top: 1px solid #333; /* Тонка лінія зверху, щоб відділити від контенту */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  /* --- ВЕРХНЯ ЧАСТИНА --- */
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .footer-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4ade80; /* Зелений акцент (як у профілі) */
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .footer-desc {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }
+  
+  .footer-nav {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .footer-link {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-link:hover {
+    color: #4ade80; /* Зелений при наведенні */
+  }
+  
+  /* Розділювач */
+  .footer-divider {
+    height: 1px;
+    background-color: #333;
+    margin: 20px 0 40px;
+  }
+  
+  /* --- БЛОК КОНТАКТІВ (Як на скріншоті) --- */
+  .footer-bottom {
+    margin-bottom: 40px;
+  }
+  
+  .footer-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: white;
+    letter-spacing: 1px;
+  }
+  
+  .contact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px; /* Відстань між колонками телефонів і пошти */
+  }
+  
+  .contact-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .contact-item {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+  }
+  
+  .contact-item:hover {
+    color: #4ade80;
+  }
+  
+  .contact-text {
+    color: #888;
+    font-size: 0.95rem;
+  }
+  
+  /* --- КОПІРАЙТ --- */
+  .footer-copyright {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 40px;
+    border-top: 1px solid #1f1f1f;
+    padding-top: 20px;
+  }
+  
+  /* Адаптивність для мобільних */
+  @media (max-width: 768px) {
+    .footer-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .contact-grid {
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
