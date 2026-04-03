@@ -98,6 +98,16 @@ export interface SearchResults {
   watchlists: WatchlistSearch[] | null;
   credits: CreditSearch[] | null;
 }
+export const fetchMovieOfTheDay = async () => {
+  try {
+    const response = await myBackendClient.get('/movie_of_the_day');
+    // Повертаємо саме об'єкт results, як вказано в твоїй структурі
+    return response.data.results; 
+  } catch (error) {
+    console.error("Error fetching movie of the day:", error);
+    return null;
+  }
+};
 // --- API ЗАПИТИ ---
 
 // УВАГА: Цей запит (/login) не спрацює з API TMDB. 

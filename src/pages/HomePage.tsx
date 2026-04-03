@@ -1,31 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import MovieRow from '../components/MovieRow';
+import { Link } from 'react-router-dom';
 import { 
     getTrendingMovies, 
     getNowPlayingMovies, 
     getTopRatedMovies, 
     getUpcomingMovies, 
     getImageUrl,
-    // Переконайся, що Movie експортується з api/tmdbApi.ts, 
-    // або розкоментуй інтерфейс нижче
-    // Movie 
+    fetchMovieOfTheDay // Додав твій новий запит
 } from '../api/tmdbApi';
+import MovieRow from '../components/MovieRow';
 import './HomePage.css'; 
-
-// Якщо Movie не експортується з api файлу, розкоментуй це:
-/*
-interface Movie {
-  id: number;
-  poster_path: string;
-  backdrop_path?: string;
-  title: string;
-  overview?: string;
-  vote_average: number;
-}
-*/
-
-// Або використовуй any, якщо ліньки типізувати зараз:
-// type Movie = any; 
 
 export default function HomePage() {
   const [trending, setTrending] = useState<any[]>([]);
@@ -39,12 +23,13 @@ export default function HomePage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Виконуємо всі запити паралельно через твої функції
-        const [trendData, nowData, topData, upData] = await Promise.all([
+        // Виконуємо всі запити паралельно, включаючи фільм дня
+        const [trendData, nowData, topData, upData, dailyMovie] = await Promise.all([
             getTrendingMovies(),
             getNowPlayingMovies(),
             getTopRatedMovies(),
-            getUpcomingMovies()
+            getUpcomingMovies(),
+            fetchMovieOfTheDay() // Наш новий герой
         ]);
 
         setTrending(trendData.results || []);
@@ -52,11 +37,12 @@ export default function HomePage() {
         setTopRated(topData.results || []);
         setUpcoming(upData.results || []);
 
-        // Вибираємо випадковий фільм для банера
-        const allMovies = nowData.results || [];
-        if (allMovies.length > 0) {
-            const random = allMovies[Math.floor(Math.random() * allMovies.length)];
-            setHeroMovie(random);
+        // Встановлюємо фільм дня. Якщо він прийшов — беремо його, 
+        // якщо раптом помилка — беремо перший зі списку трендів як запасний.
+        if (dailyMovie) {
+            setHeroMovie(dailyMovie);
+        } else if (trendData.results?.length > 0) {
+            setHeroMovie(trendData.results[0]);
         }
 
       } catch (err) {
@@ -75,35 +61,45 @@ export default function HomePage() {
     <div className="home-container">
       
       {/* HERO BANNER */}
-      {heroMovie && (
-          <header 
-            className="banner"
-            style={{
-                backgroundImage: `url("${getImageUrl(heroMovie.backdrop_path || heroMovie.poster_path, 'original')}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center top',
-            }}
-          >
-              <div className="banner-contents">
-                  <h1 className="banner-title">
-                      {heroMovie.title}
-                  </h1>
+     {heroMovie && (
+  <header 
+    className="banner"
+    style={{
+      backgroundSize: "cover",
+      // Використовуємо BackdropPath для широкого формату
+      backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(17,17,17,1) 100%), 
+                        url("${getImageUrl(heroMovie.backdrop_path || heroMovie.poster_path, 'original')}")`,
+      backgroundPosition: "center 20%",
+    }}
+  >
+    <div className="banner-contents">
+      <h1 className="banner-title">
+        {heroMovie.title || heroMovie.name}
+      </h1>
 
-                  <div className="banner-buttons">
-                      <button className="banner-button btn-play">Play</button>
-                      <button className="banner-button">More Info</button>
-                  </div>
+      <div className="banner-buttons">
+        {/* Кнопка Play може вести на трейлер або сторінку фільму */}
+        <button className="banner-button btn-play">Play</button>
+        
+        {/* Використовуємо movie_id, як у твоїй структурі MovieOfTheDay */}
+        <Link to={`/movie/${heroMovie.movie_id}`}>
+          <button className="banner-button">More Info</button>
+        </Link>
+      </div>
 
-                  {heroMovie.overview && (
-                      <h1 className="banner-description">
-                          {heroMovie.overview}
-                      </h1>
-                  )}
-              </div>
-              <div className="banner-fadeBottom" />
-          </header>
+      {/* Опис (якщо додаси його в структуру на бекенді) */}
+      {heroMovie.overview && (
+        <h1 className="banner-description">
+          {heroMovie.overview.length > 150 
+            ? heroMovie.overview.substring(0, 150) + "..." 
+            : heroMovie.overview}
+        </h1>
       )}
-
+    </div>
+    {/* Градієнт знизу для плавного переходу до списків */}
+    <div className="banner-fadeBottom" />
+  </header>
+)}
       {/* РЯДКИ ФІЛЬМІВ */}
       <div style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
         {trending.length > 0 && <MovieRow title="Trending Now" movies={trending} />}

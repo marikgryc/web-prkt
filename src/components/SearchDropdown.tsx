@@ -81,28 +81,38 @@ if (results && results.movies && results.movies.length > 0) {
             {isOpen && results && (
                 <div className="search-results-dropdown">
                     {/* Секція: Фільми */}
-                    {results.movies?.length > 0 && (
-                        <div className="search-section">
-                            <div className="search-section-title">Movies</div>
-                            {results.movies.slice(0, 5).map(movie => (
-                                <Link to={`/movie/${movie.movie_id}`} key={movie.movie_id} className="search-result-item" onClick={() => setIsOpen(false)}>
-                                    <img src={getImageUrl(movie.poster_path)} alt="" />
-                                    <div className="search-item-info">
-                                         <span className="search-item-name">{movie.title}</span>
-                                         {/* Змінюємо movie.imdb_rating на movie.vote_average */}
-                                      <span className="search-item-meta">
-  ⭐ {
-    // Перевіряємо, чи imdb_rating не є null або undefined
-    (movie.imdb_rating !== null && movie.imdb_rating !== undefined) 
-      ? Number(movie.imdb_rating).toFixed(1) 
-      : 'N/A'
-  }
-</span>
-                                            </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                  {results.movies?.length > 0 && (
+    <div className="search-section">
+        <div className="search-section-title">Movies</div>
+        {results.movies.slice(0, 5).map(movie => {
+            // Визначаємо ID (пробуємо всі варіанти, які є в твоїх структурах)
+            const id = movie.id || movie.movie_id;
+            // Визначаємо назву (для фільмів або серіалів)
+            const title = movie.title || movie.name;
+
+            return (
+                <Link 
+                    to={`/movie/${id}`} 
+                    key={id} 
+                    className="search-result-item" 
+                    onClick={() => setIsOpen(false)}
+                >
+                    <img src={getImageUrl(movie.poster_path)} alt="" />
+                    <div className="search-item-info">
+                        <span className="search-item-name">{title}</span>
+                        <span className="search-item-meta">
+                            ⭐ {
+                                (movie.imdb_rating !== undefined && movie.imdb_rating !== null) 
+                                ? Number(movie.imdb_rating).toFixed(1) 
+                                : 'N/A'
+                            }
+                        </span>
+                    </div>
+                </Link>
+            );
+        })}
+    </div>
+)}
 
                     {/* Секція: Актори */}
                     {results.credits?.length > 0 && (
