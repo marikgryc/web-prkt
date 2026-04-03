@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css'; 
 import logo from '../assets/Logo.png';
+// Твій імпорт тут:
+import { SearchDropdown } from '../components/SearchDropdown';
 
 export default function Navbar() {
   const [show, setShow] = useState(false);
@@ -37,6 +39,9 @@ export default function Navbar() {
            <Link to="/">Home</Link>
            {isAuthenticated && <Link to="/profile">My List</Link>}
         </div>
+
+        {/* 👇 ОСЬ ТУТ ДОДАЄМО КОМПОНЕНТ ПОШУКУ 👇 */}
+        <SearchDropdown />
 
         {isAuthenticated ? (
             <img

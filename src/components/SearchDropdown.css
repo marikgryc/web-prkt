@@ -1,0 +1,119 @@
+/* Контейнер-обгортка, який ми вставимо в Navbar */
+.search-wrapper {
+  position: absolute; /* Абсолют по центру Navbar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 350px;
+  z-index: 1000;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-field {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 35px 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input-field:focus {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: #06530c; /* Червоний акцент */
+}
+
+.search-loader {
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+}
+
+/* Випадаючий список */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: #141414; /* Dark mode */
+  border: 1px solid #333;
+  border-radius: 4px;
+  max-height: 450px;
+  overflow-y: auto;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.search-section-title {
+  background: #222;
+  color: #808080;
+  padding: 4px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: white;
+  border-bottom: 1px solid #222;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: #333;
+}
+
+.search-result-item img {
+  width: 35px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 12px;
+  border-radius: 2px;
+}
+
+.search-result-item img.round-img {
+  height: 35px;
+  border-radius: 50%;
+}
+
+.search-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-item-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.search-item-meta {
+  font-size: 12px;
+  color: #b3b3b3;
+}
+
+.search-no-results {
+  padding: 20px;
+  text-align: center;
+  color: #808080;
+  font-size: 14px;
+}
+
+/* Скролбар для dropdown */
+.search-results-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.search-results-dropdown::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}

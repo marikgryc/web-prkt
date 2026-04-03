@@ -1,13 +1,13 @@
 import axios from 'axios'; // 1. Додали імпорт самої бібліотеки
 
 // 2. Визначаємо константи (встав сюди свій ключ!)
-export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43'; 
+export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
-export const MY_BACKEND_URL = 'http://13.62.214.254:8080/';
+export const MY_BACKEND_URL = 'http://185.227.108.14:8080/';
 // Тимчасова заглушка для MOCK_MOVIES, щоб код не падав, якщо ти їх видалив
-const MOCK_MOVIES: Movie[] = []; 
+const MOCK_MOVIES: Movie[] = [];
 
 // 3. Створюємо налаштований клієнт
 // (Ми прибрали import axiosClient з початку файлу, бо створюємо його тут)
@@ -27,17 +27,17 @@ const myBackendClient = axios.create({
 });
 // --- ТИПИ ДАНИХ ---
 export interface User {
-  user_id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  avatar_url: string;
-  bio?: string;
-  followers?: number;
-  followings?: number;
-  created_at?: string;
-  bg_img_url?: string;
+    user_id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    avatar_url: string;
+    bio?: string;
+    followers?: number;
+    followings?: number;
+    created_at?: string;
+    bg_img_url?: string;
 }
 
 export interface Movie {
@@ -49,7 +49,7 @@ export interface Movie {
     vote_average: number;
     release_date?: string;
 }
-  
+
 export interface MovieResponse {
     page: number;
     results: Movie[];
@@ -57,6 +57,47 @@ export interface MovieResponse {
     total_results: number;
 }
 
+
+export interface UserSearch {
+  user_id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string;
+  is_active?: boolean;
+}
+
+export interface MovieSearchItem {
+  id?: number; // Зверни увагу, бекенд віддає 'id' замість 'movie_id' у пошуку
+  title?: string;
+  poster_path?: string;
+  profile_path?: string;
+  imdb_rating?: number;
+  name: string;
+  media_type: string;
+}
+
+export interface CreditSearch {
+  credit_id: number;
+  name: string;
+  profile_path?: string;
+}
+
+export interface WatchlistSearch {
+  watchlist_id: number;
+  name: string;
+  fg_img_url: string;
+  creator: string;
+  movies_quantity: number;
+}
+
+// Головна структура відповіді
+export interface SearchResults {
+  movies: MovieSearchItem[] | null;
+  users: UserSearch[] | null;
+  watchlists: WatchlistSearch[] | null;
+  credits: CreditSearch[] | null;
+}
 // --- API ЗАПИТИ ---
 
 // УВАГА: Цей запит (/login) не спрацює з API TMDB. 
@@ -65,7 +106,7 @@ export const loginUser = async (loginData: { login: string; password: string }) 
     try {
         console.log("🔐 Логін: відправка даних...", loginData);
 
-        const response = await axios.post('http://13.62.214.254:8080/login', {
+        const response = await axios.post('http://185.227.108.14:8080/login', {
             login: loginData.login,
             password: loginData.password
         });
@@ -74,7 +115,7 @@ export const loginUser = async (loginData: { login: string; password: string }) 
 
         // 1. Перевіряємо, чи є results і чи це масив
         const results = response.data.results;
-        
+
         if (!results || (Array.isArray(results) && results.length === 0)) {
             throw new Error("Сервер не повернув даних користувача");
         }
@@ -94,10 +135,10 @@ export const loginUser = async (loginData: { login: string; password: string }) 
             first_name: userFromServer.first_name || "",
             last_name: userFromServer.last_name || "",
             email: userFromServer.email || "",
-            
+
             // Аватарка з сервера, або заглушка
             avatar_url: userFromServer.avatar_url || "https://via.placeholder.com/150",
-            
+
             // Цих полів сервер поки не віддає, тому ставимо дефолтні:
             followers: userFromServer.followers || 0,
             followings: userFromServer.followings || 0,
@@ -113,29 +154,40 @@ export const loginUser = async (loginData: { login: string; password: string }) 
 // Це теж для власного бекенду (/users/id)
 export const getUserProfile = async (id: number) => {
     try {
-        const response = await myBackendClient.get(`/users/${id}`);
-        return response.data.results; 
+        // 1. Робимо запит на робочий ендпоінт (отримуємо всіх юзерів)
+        const response = await myBackendClient.get(`/users`);
+        
+        // 2. Беремо масив юзерів з відповіді (залежить від структури JSON бекенду)
+        const allUsers = response.data.results || response.data;
+        
+        // 3. Шукаємо конкретного юзера по ID
+        const currentUser = allUsers.find((user: any) => user.user_id === id);
+        
+        if (!currentUser) {
+            throw new Error("Юзера з таким ID не знайдено в списку");
+        }
+
+        return currentUser; 
     } catch (error) {
         console.error("Error fetching profile:", error);
         throw error;
     }
 };
-
 // Це комбінована функція. Для чистого TMDB краще використовувати getTrendingMovies
 export const getPopularMovies = async () => {
     try {
         console.log("📡 Стукаємо за фільмами (TMDB): /movie/popular");
         // Виправлено шлях: у TMDB це /movie/popular (однина), а не /movies
-        const response = await tmdbClient.get('/movie/popular'); 
-        
-        console.log("✅ Відповідь сервера фільмів:", response.data); 
+        const response = await tmdbClient.get('/movie/popular');
+
+        console.log("✅ Відповідь сервера фільмів:", response.data);
 
         const serverData = response.data.results; // TMDB повертає results
 
         if (Array.isArray(serverData) && serverData.length > 0) {
             return { results: serverData };
-        } 
-        
+        }
+
         console.warn("⚠️ Сервер дав пустий список.");
         return { results: MOCK_MOVIES };
 
@@ -166,17 +218,17 @@ export const getTrendingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/trending/movie/week');
     return response.data;
 };
-  
+
 export const getNowPlayingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/now_playing');
     return response.data;
 };
-  
+
 export const getTopRatedMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/top_rated');
     return response.data;
 };
-  
+
 export const getUpcomingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/upcoming');
     return response.data;
@@ -184,18 +236,33 @@ export const getUpcomingMovies = async () => {
 
 // Допоміжна функція картинок
 export const getImageUrl = (path: string | null | undefined, size: string = 'w500') => {
-  if (!path) {
-    return 'https://via.placeholder.com/500x750?text=No+Image'; 
-  }
-  return `https://image.tmdb.org/t/p/${size}${path}`;
+    if (!path) {
+        return 'https://via.placeholder.com/500x750?text=No+Image';
+    }
+    return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 export const getMovieCredits = async (id: number) => {
     // Залежно від того, як у вас налаштований axios, шлях може трохи відрізнятися
     // Але зазвичай це: /movie/{id}/credits
-    const response = await tmdbClient.get(`/movie/${id}/credits`); 
+    const response = await tmdbClient.get(`/movie/${id}/credits`);
     return response.data.cast;
-  };
+};
 export const getActorDetails = async (id: number) => {
     // Поки заглушка, пізніше можна зробити запит /person/{id}
     return { id, name: "Actor Info Unavailable", biography: "", profile_path: null, known_for: [] };
+    
+};
+export const fetchGlobalSearch = async (query: string): Promise<SearchResults> => {
+  try {
+    const safeQuery = encodeURIComponent(query.trim());
+    
+    // Використовуємо твій myBackendClient
+    const response = await myBackendClient.get(`/search/${safeQuery}`);
+    
+    // Перевіряємо структуру відповіді (чи є results, чи напряму віддає)
+    return response.data.results || response.data; 
+  } catch (error) {
+    console.error("Error global search:", error);
+    throw error;
+  }
 };
