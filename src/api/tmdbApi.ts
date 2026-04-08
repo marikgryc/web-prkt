@@ -108,6 +108,17 @@ export const fetchMovieOfTheDay = async () => {
     return null;
   }
 };
+export const getSimilarMovies = async (id: number) => {
+    try {
+        // Запит до вашого бекенду
+        const response = await myBackendClient.get(`/movies/${id}/similar`);
+        // Згідно з вашою структурою, результати лежать в response.data.results
+        return response.data.results || [];
+    } catch (error) {
+        console.error("Error fetching similar movies:", error);
+        return [];
+    }
+};
 // --- API ЗАПИТИ ---
 
 // УВАГА: Цей запит (/login) не спрацює з API TMDB. 

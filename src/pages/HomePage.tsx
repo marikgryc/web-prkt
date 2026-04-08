@@ -6,7 +6,7 @@ import {
     getTopRatedMovies, 
     getUpcomingMovies, 
     getImageUrl,
-    fetchMovieOfTheDay // Додав твій новий запит
+    fetchMovieOfTheDay 
 } from '../api/tmdbApi';
 import MovieRow from '../components/MovieRow';
 import './HomePage.css'; 
@@ -23,13 +23,12 @@ export default function HomePage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Виконуємо всі запити паралельно, включаючи фільм дня
         const [trendData, nowData, topData, upData, dailyMovie] = await Promise.all([
             getTrendingMovies(),
             getNowPlayingMovies(),
             getTopRatedMovies(),
             getUpcomingMovies(),
-            fetchMovieOfTheDay() // Наш новий герой
+            fetchMovieOfTheDay()    
         ]);
 
         setTrending(trendData.results || []);
