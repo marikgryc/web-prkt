@@ -1,27 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getUserProfile, User } from '../api/tmdbApi';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { id } = useParams<{ id: string }>(); 
+  const { user: currentUser, loading: authLoading, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [profileUser, setProfileUser] = useState<User | null>(null);
+  const [fetching, setFetching] = useState(false);
   const [activeTab, setActiveTab] = useState('Posts');
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (authLoading) return; // Чекаємо, поки AuthContext відновить сесію
 
-  if (!user) {
-      return <div className="loading-text">Loading user info...</div>;
+      try {
+        if (id) {
+          setFetching(true);
+          const data = await getUserProfile(Number(id));
+          setProfileUser(data);
+        } else if (currentUser) {
+          setProfileUser(currentUser);
+        }
+      } catch (err) {
+        console.error("Profile load error:", err);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    loadProfile();
+  }, [id, currentUser, authLoading]);
+
+  if (authLoading || fetching) {
+    return <div className="loading-text">Loading profile...</div>;
   }
 
-  const avatarUrl = user.avatar_url || "https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png";
-  const bgUrl = user.bg_img_url; 
+  if (!profileUser) {
+    return <div className="loading-text">User not found. Please log in.</div>;
+  }
 
-  const joinDate = user.created_at 
-    ? new Date(user.created_at).toLocaleDateString() 
+  // Оголошуємо змінні ТУТ, щоб не було ReferenceError
+  const isMyProfile = currentUser?.user_id === profileUser.user_id;
+  const avatarUrl = profileUser.avatar_url || "https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png";
+  const bgUrl = profileUser.bg_img_url; 
+
+  const joinDate = profileUser.created_at 
+    ? new Date(profileUser.created_at).toLocaleDateString() 
     : "Unknown date";
 
   return (
@@ -29,21 +57,14 @@ export default function ProfilePage() {
       
       <div 
         className="profile-cover" 
-        style={{
-           backgroundImage: bgUrl ? `url(${bgUrl})` : undefined 
-        }}
+        style={{ backgroundImage: bgUrl ? `url(${bgUrl})` : undefined }}
       ></div>
 
-      {/* Основний контейнер контенту */}
       <div className="profile-container">
-        
-        {/* --- ШАПКА ПРОФІЛЮ --- */}
         <div className="profile-header">
-          
-          {/* Аватарка (заїжджає на обкладинку) */}
           <img 
             src={avatarUrl} 
-            alt={user.username} 
+            alt={profileUser.username} 
             className="profile-avatar-large"
             onError={(e) => {
               e.currentTarget.src = "https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png";
@@ -53,37 +74,36 @@ export default function ProfilePage() {
           <div className="profile-info">
             <div className="profile-names">
                 <h1 className="profile-name">
-                {user.first_name} {user.last_name}
+                {profileUser.first_name} {profileUser.last_name}
                 </h1>
-                <p className="profile-handle">@{user.username}</p>
+                <p className="profile-handle">@{profileUser.username}</p>
             </div>
 
-            {/* 2. БІОГРАФІЯ (Виводимо, тільки якщо є текст) */}
-            {user.bio && (
+            {profileUser.bio && (
                 <div className="profile-bio">
-                    {user.bio}
+                    {profileUser.bio}
                 </div>
             )}
 
             <span className="profile-joined">Joined {joinDate}</span>
 
-            {/* Статистика */}
             <div className="profile-stats-row">
               <div className="stat-box">
-                  <strong>{user.followings || 0}</strong> Following
+                  <strong>{profileUser.followings || 0}</strong> Following
               </div>
               <div className="stat-box">
-                  <strong>{user.followers || 0}</strong> Followers
+                  <strong>{profileUser.followers || 0}</strong> Followers
               </div>
               
-              <div className="stat-box logout-btn" onClick={handleLogout}>
-                 Log Out
-              </div>
+              {isMyProfile && (
+                <div className="stat-box logout-btn" onClick={() => { logout(); navigate('/'); }}>
+                   Log Out
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* --- ВКЛАДКИ --- */}
         <div className="profile-tabs">
           {['Posts', 'Playlist', 'Saved stories', 'Wishlist'].map((tab) => (
             <button 
@@ -96,7 +116,6 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* --- КОНТЕНТ ВКЛАДОК --- */}
         <div className="posts-section">
           <div style={{color: '#666', fontSize: '1.2rem', marginTop: '20px'}}>
               Content for <b>{activeTab}</b> will appear here.

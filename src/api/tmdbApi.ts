@@ -33,11 +33,12 @@ export interface User {
     last_name: string;
     email: string;
     avatar_url: string;
-    bio?: string;
-    followers?: number;
-    followings?: number;
+    bio?: string;      // Додано
+    followers?: number; // Додано
+    followings?: number;// Додано
+    bg_img_url?: string;// Додано
     created_at?: string;
-    bg_img_url?: string;
+    is_active?: boolean;
 }
 
 export interface Movie {
@@ -175,23 +176,34 @@ export const loginUser = async (loginData: { login: string; password: string }) 
 // Це теж для власного бекенду (/users/id)
 export const getUserProfile = async (id: number) => {
     try {
-        // 1. Робимо запит на робочий ендпоінт (отримуємо всіх юзерів)
-        const response = await myBackendClient.get(`/users`);
+        // Поки бекенд не підтримує стабільний запит /users/:id, 
+        // вантажимо всіх юзерів і фільтруємо локально.
+        const response = await myBackendClient.get('/users');
         
-        // 2. Беремо масив юзерів з відповіді (залежить від структури JSON бекенду)
+        // Залежно від того, як бекенд віддає масив (в results чи напряму)
         const allUsers = response.data.results || response.data;
         
-        // 3. Шукаємо конкретного юзера по ID
+        // Шукаємо нашого юзера
         const currentUser = allUsers.find((user: any) => user.user_id === id);
         
         if (!currentUser) {
-            throw new Error("Юзера з таким ID не знайдено в списку");
+            throw new Error("Юзера з таким ID не знайдено в загальному списку");
         }
 
         return currentUser; 
     } catch (error) {
         console.error("Error fetching profile:", error);
         throw error;
+    }
+};
+export const getUserById = async (id: number): Promise<User | null> => {
+    try {
+        const response = await myBackendClient.get(`/users/${id}`);
+        // Твій сервер повертає дані в об'єкті results
+        return response.data.results; 
+    } catch (error) {
+        console.error("Помилка завантаження профілю:", error);
+        return null;
     }
 };
 // Це комбінована функція. Для чистого TMDB краще використовувати getTrendingMovies
@@ -230,11 +242,14 @@ export const getGenres = async () => {
 // --- ФУНКЦІЇ ДЛЯ TMDB (Головна сторінка) ---
 
 export const getMovieDetails = async (id: number) => {
-    console.log(`📡 Запит деталів фільму ID: ${id}`);
-    const response = await tmdbClient.get(`/movie/${id}`); // Виправлено шлях: /movie/{id}
+    const response = await tmdbClient.get(`/movie/${id}`, {
+        params: {
+            // Це змусить TMDB докинути масив відео прямо в об'єкт фільму
+            append_to_response: 'videos,credits' 
+        }
+    });
     return response.data;
 };
-
 export const getTrendingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/trending/movie/week');
     return response.data;
