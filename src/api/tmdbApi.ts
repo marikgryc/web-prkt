@@ -176,8 +176,10 @@ export const loginUser = async (loginData: { login: string; password: string }) 
 // Це теж для власного бекенду (/users/id)
 export const getUserProfile = async (id: number) => {
     try {
+
         // Поки бекенд не підтримує стабільний запит /users/:id, 
         // вантажимо всіх юзерів і фільтруємо локально.
+        
         const response = await myBackendClient.get('/users');
         
         // Залежно від того, як бекенд віддає масив (в results чи напряму)
