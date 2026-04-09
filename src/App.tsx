@@ -10,6 +10,7 @@ import SignupPage from './pages/SignupPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
+          <Route path="/chat" element={<ChatPage />} />
         </Routes>
       </AnimatePresence>
       <Footer />

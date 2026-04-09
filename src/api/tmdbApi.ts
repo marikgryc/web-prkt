@@ -291,16 +291,36 @@ export const getActorDetails = async (id: number) => {
     
 };
 export const fetchGlobalSearch = async (query: string): Promise<SearchResults> => {
-  try {
-    const safeQuery = encodeURIComponent(query.trim());
-    
-    // Використовуємо твій myBackendClient
-    const response = await myBackendClient.get(`/search/${safeQuery}`);
-    
-    // Перевіряємо структуру відповіді (чи є results, чи напряму віддає)
-    return response.data.results || response.data; 
-  } catch (error) {
-    console.error("Error global search:", error);
-    throw error;
-  }
-};
+    try {
+      const safeQuery = encodeURIComponent(query.trim());
+      const response = await myBackendClient.get(`/search/${safeQuery}`);
+      
+      // Дістаємо загальний масив результатів (той самий, де лежить Shrek)
+      const itemsArray = response.data?.results?.results || [];
+  
+      // Створюємо порожню структуру, яку очікує твій SearchDropdown
+      const groupedResults: SearchResults = {
+        movies: [],
+        users: [],
+        credits: [],
+        watchlists: []
+      };
+  
+      // Сортуємо результати по їхньому "type"
+      if (Array.isArray(itemsArray)) {
+        itemsArray.forEach((item: any) => {
+          if (item.type === 'movies') groupedResults.movies!.push(item);
+          else if (item.type === 'users') groupedResults.users!.push(item);
+          else if (item.type === 'credits' || item.type === 'actors') groupedResults.credits!.push(item);
+          else if (item.type === 'watchlists') groupedResults.watchlists!.push(item);
+        });
+      }
+  
+      // Віддаємо розсортовані дані у компонент
+      return groupedResults; 
+      
+    } catch (error) {
+      console.error("Error global search:", error);
+      throw error;
+    }
+  };

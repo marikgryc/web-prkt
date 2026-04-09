@@ -101,12 +101,16 @@ if (results && results.movies && results.movies.length > 0) {
                     <div className="search-item-info">
                         <span className="search-item-name">{title}</span>
                         <span className="search-item-meta">
-                            ⭐ {
-                                (movie.imdb_rating !== undefined && movie.imdb_rating !== null) 
-                                ? Number(movie.imdb_rating).toFixed(1) 
-                                : 'N/A'
-                            }
-                        </span>
+    ⭐ {
+        // Перевіряємо обидва варіанти: і imdb_rating, і vote_average
+        (() => {
+            const rating = movie.imdb_rating ?? movie.vote_average;
+            return (rating !== undefined && rating !== null && rating !== 0) 
+                ? Number(rating).toFixed(1) 
+                : 'N/A';
+        })()
+    }
+</span>
                     </div>
                 </Link>
             );

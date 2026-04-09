@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setUser(userData);
             } catch (e) {
                 console.error("Failed to restore user session");
-                
+                localStorage.removeItem('cinelink_user_id');
             } finally {
                 setLoading(false);
             }
