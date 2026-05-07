@@ -16,10 +16,8 @@ export default function HomePage() {
   const [nowPlaying, setNowPlaying] = useState<any[]>([]);
   const [topRated, setTopRated] = useState<any[]>([]);
   const [upcoming, setUpcoming] = useState<any[]>([]);
-  
   const [heroMovie, setHeroMovie] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -30,14 +28,10 @@ export default function HomePage() {
             getUpcomingMovies(),
             fetchMovieOfTheDay()    
         ]);
-
         setTrending(trendData.results || []);
         setNowPlaying(nowData.results || []);
         setTopRated(topData.results || []);
         setUpcoming(upData.results || []);
-
-        // Встановлюємо фільм дня. Якщо він прийшов — беремо його, 
-        // якщо раптом помилка — беремо перший зі списку трендів як запасний.
         if (dailyMovie) {
             setHeroMovie(dailyMovie);
         } else if (trendData.results?.length > 0) {

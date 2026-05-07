@@ -9,8 +9,6 @@ export const SearchDropdown = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef(null);
-
-    // Закриття при кліку поза межами
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -20,15 +18,12 @@ export const SearchDropdown = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    // Пошук з Debounce
     useEffect(() => {
         if (query.trim().length < 2) {
             setResults(null);
             setIsOpen(false);
             return;
         }
-
         const delayDebounceFn = setTimeout(async () => {
             setIsLoading(true);
             try {
@@ -41,23 +36,16 @@ export const SearchDropdown = () => {
                 setIsLoading(false);
             }
         }, 500);
-
         return () => clearTimeout(delayDebounceFn);
     }, [query]);
 
  const getImageUrl = (path, isAvatar = false) => {
-  // 1. Якщо шляху немає (null або undefined) — ставимо надійну заглушку
   if (!path) {
     return isAvatar 
       ? `https://ui-avatars.com/api/?name=User&background=333&color=fff` 
       : `https://placehold.co/40x60/222/ffffff?text=No+Img`;
   }
-
-  // 2. Якщо раптом прийшло повне посилання
   if (path.startsWith('http')) return path;
-
-  // 3. Якщо це стандартний шлях TMDB (починається з /)
-  // Використовуємо маленьку ширину w200 для швидкості завантаження в пошуку
   return `https://image.tmdb.org/t/p/w200${path}`;
 };
 if (results && results.movies && results.movies.length > 0) {
@@ -118,19 +106,19 @@ if (results && results.movies && results.movies.length > 0) {
     </div>
 )}
 
-                    {/* Секція: Актори */}
-                    {results.credits?.length > 0 && (
-                        <div className="search-section">
-                            <div className="search-section-title">Actors</div>
-                            {results.credits.slice(0, 3).map(credit => (
-                                <Link to={`/person/${credit.credit_id}`} key={credit.credit_id} className="search-result-item" onClick={() => setIsOpen(false)}>
-                                    <img src={getImageUrl(credit.profile_path, true)} className="round-img" alt="" />
-                                    <span className="search-item-name">{credit.name}</span>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-
+                   {/* Секція: Актори */}
+                        {results.credits?.length > 0 && (
+                            <div className="search-section">
+                                <div className="search-section-title">Actors</div>
+                                {results.credits.slice(0, 3).map(credit => (
+                                    // ВИПРАВЛЕНО: замінили /person/ на /actor/
+                                    <Link to={`/actor/${credit.credit_id}`} key={credit.credit_id} className="search-result-item" onClick={() => setIsOpen(false)}>
+                                        <img src={getImageUrl(credit.profile_path, true)} className="round-img" alt="" />
+                                        <span className="search-item-name">{credit.name}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     {/* Секція: Користувачі */}
                     {results.users?.length > 0 && (
                         <div className="search-section">

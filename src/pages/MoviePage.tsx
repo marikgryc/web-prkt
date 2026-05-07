@@ -153,7 +153,13 @@ const MoviePage: React.FC = () => {
           <h2 className="section-title">Top Cast</h2>
           <div className="cast-scroller">
             {cast.map(actor => (
-              <div key={actor.id} className="cast-card">
+              
+              <div 
+              key={actor.id} 
+              className="cast-card" 
+              onClick={() => navigate(`/actor/${actor.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
                 <div className="cast-img-wrapper">
                   {actor.profile_path ? (
                     <img src={getImageUrl(actor.profile_path)} alt={actor.name} />

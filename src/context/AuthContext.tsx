@@ -41,28 +41,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     try {
         console.log("AuthContext: Starting login process...");
-        
-        // 1. Отримуємо відповідь від сервера (це може бути ID або весь юзер)
         const responseData = await loginUser({ login: email, password: pass });
         console.log("AuthContext: Received data:", responseData);
-
         let userId: number;
         let userData: User;
-
-        // 2. Перевіряємо, що саме прийшло
         if (typeof responseData === 'object' && responseData !== null && 'user_id' in responseData) {
-            // УРА! Сервер повернув відразу готового юзера
             console.log("AuthContext: Login returned full user object!");
             userData = responseData as User;
             userId = userData.user_id;
         } else {
-            // Прийшло тільки ID (наприклад, з нашого Bypass або так змінився сервер)
             console.log("AuthContext: Login returned ID. Fetching profile...");
             userId = Number(responseData);
             userData = await getUserProfile(userId);
         }
-
-        // 3. Зберігаємо
         setUser(userData);
         localStorage.setItem('cinelink_user_id', String(userId));
 

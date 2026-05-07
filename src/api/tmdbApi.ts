@@ -1,16 +1,10 @@
-import axios from 'axios'; // 1. Додали імпорт самої бібліотеки
-
-// 2. Визначаємо константи (встав сюди свій ключ!)
+import axios from 'axios'; 
 export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 export const MY_BACKEND_URL = 'http://185.227.108.14:8080/';
-// Тимчасова заглушка для MOCK_MOVIES, щоб код не падав, якщо ти їх видалив
-const MOCK_MOVIES: Movie[] = [];
 
-// 3. Створюємо налаштований клієнт
-// (Ми прибрали import axiosClient з початку файлу, бо створюємо його тут)
 const tmdbClient = axios.create({
     baseURL: BASE_URL,
     params: {
@@ -22,10 +16,9 @@ const myBackendClient = axios.create({
     baseURL: MY_BACKEND_URL,
     headers: {
         'Content-Type': 'application/json',
-        // Якщо треба передавати токен авторизації, це робиться тут
+       
     }
 });
-// --- ТИПИ ДАНИХ ---
 export interface User {
     user_id: number;
     username: string;
@@ -256,17 +249,14 @@ export const getTrendingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/trending/movie/week');
     return response.data;
 };
-
 export const getNowPlayingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/now_playing');
     return response.data;
 };
-
 export const getTopRatedMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/top_rated');
     return response.data;
 };
-
 export const getUpcomingMovies = async () => {
     const response = await tmdbClient.get<MovieResponse>('/movie/upcoming');
     return response.data;
@@ -285,10 +275,37 @@ export const getMovieCredits = async (id: number) => {
     const response = await tmdbClient.get(`/movie/${id}/credits`);
     return response.data.cast;
 };
-export const getActorDetails = async (id: number) => {
-    // Поки заглушка, пізніше можна зробити запит /person/{id}
-    return { id, name: "Actor Info Unavailable", biography: "", profile_path: null, known_for: [] };
-    
+export const getActorDetails = async (id: number | string) => {
+    try {
+        // Робимо запит до твого бекенду за кредитом (актором/персоналом)
+        const response = await myBackendClient.get(`/credits/${id}`);
+        
+        // Згідно з новою структурою, дані знаходяться у results.details
+        const details = response.data.results.details;
+
+        // Перетворюємо числове значення статі на текстове (1 - жінка, 2 - чоловік, 0 - невідомо)
+        let genderText = 'Невідомо';
+        if (details.gender === 1) genderText = 'Жінка';
+        else if (details.gender === 2) genderText = 'Чоловік';
+
+        // Повертаємо об'єкт у форматі, якого очікує компонент ActorPage
+        return {
+            id: details.id,
+            name: details.name,
+            biography: details.biography || "Біографія відсутня.",
+            profile_path: details.profile_path,
+            birthday: details.birthday || "Немає даних",
+            gender: genderText,
+            rating: details.popularity || "Немає даних", // Використовуємо popularity замість rating
+            place_of_birth: details.place_of_birth || "Немає даних",
+            
+            known_for_department: details.known_for_department || "Немає даних",
+            known_for: [] 
+        };
+    } catch (error) {
+        console.error("Помилка завантаження деталей актора:", error);
+        return null;
+    }
 };
 export const fetchGlobalSearch = async (query: string): Promise<SearchResults> => {
     try {

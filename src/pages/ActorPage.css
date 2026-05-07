@@ -128,3 +128,21 @@
     display: block;
     line-height: 1.2;
   }
+  .actor-photo-wrapper {
+  flex-shrink: 0; 
+}
+
+/* Блок з інформацією про актора (ім'я, кнопка, характеристики) */
+.actor-info {
+  flex: 1; /* Займає весь вільний простір справа від фото */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Відступи для секцій Біографії та Known For */
+.section {
+  margin-top: 40px;
+  border-top: 1px solid #333; /* Легке розділення блоків */
+  padding-top: 20px;
+}

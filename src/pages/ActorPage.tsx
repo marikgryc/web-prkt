@@ -5,12 +5,14 @@ import './ActorPage.css';
 
 export default function ActorPage() {
   const { id } = useParams();
+  const navigate = useNavigate(); // ДОДАНО: ініціалізація navigate для кліків по фільмах
 
   const [actor, setActor] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getActorDetails(Number(id));
+      // Передаємо id. Якщо він приходить з useParams, це стрічка
+      const data = await getActorDetails(id as string);
       setActor(data);
     };
     fetchData();
@@ -27,7 +29,8 @@ export default function ActorPage() {
         <div className="actor-header">
           <div className="actor-photo-wrapper">
              <img 
-                src={`${IMAGE_BASE_URL}${actor.profile_path}`} 
+                // Перевірка: якщо фото немає, показуємо заглушку
+                src={actor.profile_path ? `${IMAGE_BASE_URL}${actor.profile_path}` : 'https://via.placeholder.com/250x350?text=No+Photo'} 
                 alt={actor.name} 
                 className="actor-photo" 
              />
@@ -47,13 +50,18 @@ export default function ActorPage() {
                 <span className="value">{actor.gender}</span>
               </div>
               <div className="info-row">
-                <span className="label">Rating:</span>
+                <span className="label">Popularity:</span>
                 <span className="value">{actor.rating}</span>
               </div>
               <div className="info-row">
                 <span className="label">Place of Birth:</span>
                 <span className="value">{actor.place_of_birth}</span>
               </div>
+              <div className="info-row">
+                <span className="label">Known For:</span>
+                <span className="value">{actor.known_for_department}</span>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -64,18 +72,20 @@ export default function ActorPage() {
           <p className="bio-text">{actor.biography}</p>
         </div>
 
-        {/* Фільмографія (Known for) */}
-        <div className="section">
-          <h2 className="section-title">Known for</h2>
-          <div className="known-grid">
-            {actor.known_for.map((movie: any) => (
-              <div key={movie.id} className="known-item" onClick={() => navigate(`/movie/${movie.id}`)}>
-                <img src={`${IMAGE_BASE_URL}${movie.poster_path}`} alt={movie.title} />
-                <span className="known-title">{movie.title}</span>
-              </div>
-            ))}
+        {/* Фільмографія (Known for) - показуємо тільки якщо є елементи */}
+        {actor.known_for && actor.known_for.length > 0 && (
+          <div className="section">
+            <h2 className="section-title">Known for</h2>
+            <div className="known-grid">
+              {actor.known_for.map((movie: any) => (
+                <div key={movie.id} className="known-item" onClick={() => navigate(`/movie/${movie.id}`)}>
+                  <img src={`${IMAGE_BASE_URL}${movie.poster_path}`} alt={movie.title} />
+                  <span className="known-title">{movie.title}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </div>
