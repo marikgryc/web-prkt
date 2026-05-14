@@ -3,8 +3,8 @@ export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
-export const MY_BACKEND_URL = 'http://185.227.108.14:8080/';
-
+export const MY_BACKEND_URL = 'http://113.30.191.198:8080/';
+//http://113.30.191.198:808/
 const tmdbClient = axios.create({
     baseURL: BASE_URL,
     params: {
@@ -121,8 +121,8 @@ export const loginUser = async (loginData: { login: string; password: string }) 
     try {
         console.log("🔐 Логін: відправка даних...", loginData);
 
-        const response = await axios.post('http://185.227.108.14:8080/login', {
-            login: loginData.login,
+        const response = await axios.post('http://113.30.191.198:8080/login', {
+            username: loginData.login,
             password: loginData.password
         });
 
