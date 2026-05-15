@@ -34,15 +34,21 @@ class RealTimeClient {
     private globalStatusCallbacks: ((msg: any) => void)[] = [];
 
     // --- ПІДКЛЮЧЕННЯ ---
-    public connect(userId: number) {
+    public connect(userId?: number) {
+        // Якщо ID не передано в аргументах, беремо свіжий з localStorage
+        const finalUserId = userId || Number(localStorage.getItem('cinelink_user_id'));
+        
+        if (!finalUserId) {
+            console.error("Не вдалося підключити WS: ID відсутній");
+            return;
+        }
+    
         if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
             return;
         }
-
-        this.userId = userId;
-        
-        // Формуємо URL точно як у мобільному клієнті (rt_client.ts)
-        const url = `${this.BASE_WS_URL}/ws/${userId}`;
+    
+        this.userId = finalUserId;
+        const url = `${this.BASE_WS_URL}/ws/${finalUserId}`;
         console.log("Спроба підключення до WS:", url);
         
         this.ws = new WebSocket(url);

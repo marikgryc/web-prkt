@@ -1,12 +1,12 @@
 import axiosClient from '../api/axiosClient';
 import { useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import './ChatPage.css';
+import React, { useState, useEffect, useRef } from 'react';import './ChatPage.css';
 import { RTClient } from '../api/RTClient';
 import { CURRENT_USER } from '../api/currentUser';
 import { API_URL } from '../api/API_CONFIG';
 import { useNavigate } from 'react-router-dom';
 import { GetUserChats } from '../api/chats';
+
 interface ChatMessage {
   message_id: number;
   chat_id: number;
@@ -22,9 +22,21 @@ export default function ChatPage() {
   const activeChatId = Number(id); // Перетворюємо на число для запитів
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-
   const [contacts, setContacts] = useState<{id: number, name: string, avatar: string, isOnline: boolean}[]>([]);
   const activeContact = contacts.find(c => c.id === activeChatId);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Функція, яка плавно прокручує чат донизу
+  const scrollToBottom = (smooth = true) => {
+    messagesEndRef.current?.scrollIntoView({ 
+      behavior: smooth ? "smooth" : "auto" 
+    });
+  };
+
+  useEffect(() => {
+    // При отриманні нових повідомлень скролимо плавно
+    scrollToBottom(true);
+  }, [messages]);
 
   useEffect(() => {
     // Якщо ID чату немає, нічого не робимо
@@ -37,10 +49,21 @@ export default function ChatPage() {
         const data = await response.json();
         
         if (data && data.results) {
-          setMessages(data.results.reverse());
+          const normalized = data.results.map((m: any) => ({
+            ...m,
+            sender_id: m.user_id || m.sender_id,
+            user_id: m.user_id || m.sender_id
+          }));
+          setMessages(normalized);
+
+          // Миттєво скролимо вниз після завантаження історії
+          // Використовуємо setTimeout(..., 0), щоб дати React час відрендерити список
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+          }, 0);
         }
       } catch (error) {
-        console.error("Помилка завантаження історії чату:", error);
+        console.error("Помилка завантаження історії:", error);
       }
     };
 
@@ -160,7 +183,9 @@ export default function ChatPage() {
   const handleContactClick = (id: number) => {
     navigate(`/chat/${id}`); // Змінює URL на localhost:5173/chat/3
   };
+
   return (
+    <div style={{ paddingTop: '70px', height: '100vh', boxSizing: 'border-box' }}>
     <div className="chat-container">
       {/* ЛІВА ПАНЕЛЬ */}
       <div className="chat-sidebar">
@@ -168,11 +193,11 @@ export default function ChatPage() {
           <h2>Messages</h2>
         </div>
         <div className="contact-list">
-          {contacts.map(contact => (
+        {contacts.map(contact => (
             <div 
               key={contact.id} 
               className={`contact-item ${activeChatId === contact.id ? 'active' : ''}`}
-              onClick={() => setActiveChatId(contact.id)}
+              onClick={() => navigate(`/chat/${contact.id}`)} 
             >
               <div className="contact-avatar-wrapper">
                 <img src={contact.avatar} alt={contact.name} className="contact-avatar" />
@@ -202,21 +227,31 @@ export default function ChatPage() {
             </div>
 
             <div className="messages-area">
-              {messages.map(msg => {
-                const isMe = msg.sender_id === CURRENT_USER.UID;
-                return (
-                  <div key={msg.message_id} className={`message-wrapper ${isMe ? 'sent' : 'received'}`}>
-                    <div className="message-bubble">
-                      <p>{msg.message}</p>
-                      <span className="message-time">
-                        {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {messages.map((msg) => {
+              const isMine = msg.sender_id === CURRENT_USER.UID || msg.user_id === CURRENT_USER.UID;
 
+              return (
+                <div 
+                  key={msg.message_id || Math.random()} 
+                  // Використовуємо message-wrapper sent/received
+                  className={`message-wrapper ${isMine ? 'sent' : 'received'}`}
+                >
+                  {/* Використовуємо message-bubble */}
+                  <div className="message-bubble">
+                    <p>
+                      {typeof msg.message === 'string' ? msg.message : msg.content?.message}
+                    </p>
+                    <span className="message-time">
+                      {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+            
+            {/* Якір для прокрутки залишається тут */}
+            <div ref={messagesEndRef} />
+          </div>
             <form className="chat-input-area" onSubmit={handleSendMessage}>
               <input 
                 type="text" 
@@ -232,6 +267,7 @@ export default function ChatPage() {
           <div className="no-chat-selected">Select a chat to start messaging</div>
         )}
       </div>
+    </div>
     </div>
   );
 }
