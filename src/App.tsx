@@ -11,8 +11,29 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';
 import ChatPage from './pages/ChatPage';
-
+import { ChatsManager } from './api/rt_client/managers/chats_manager';
+import { UsersManager } from './api/rt_client/managers/users_manager';
+import { WatchlistsManager } from './api/rt_client/managers/watchlists_manager';
+import { RTClient } from './api/RTClient'
+import { useEffect } from "react";
 function App() {
+
+useEffect(() => {
+    // Беремо ID з того ключа, який ми узгодили раніше
+    const currentUserID = Number(localStorage.getItem('cinelink_user_id'));
+
+    if (currentUserID) {
+      console.log("Initializing Managers for User:", currentUserID);
+      
+      // Ініціалізація синглтонів
+      ChatsManager.getInstance().init(currentUserID);
+      UsersManager.getInstance().init(currentUserID);
+      WatchlistsManager.getInstance().init(currentUserID);
+      
+      // Підключення сокета
+      RTClient.connect(currentUserID);
+    }
+  }, []);
   return (
     <div className="app">
       <Navbar />

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { loginUser, getUserProfile, User } from '../api/tmdbApi';
-
+import { RTClient } from '../api/RTClient';
 interface AuthContextType {
   user: User | null;
   login: (email: string, pass: string) => Promise<void>;
@@ -36,31 +36,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkUser();
   }, []);
 
-  const login = async (email: string, pass: string) => {
+  const login = async (username: string, pass: string) => {
     setLoading(true);
     setError(null);
     try {
-        console.log("AuthContext: Starting login process...");
-        const responseData = await loginUser({ login: email, password: pass });
-        console.log("AuthContext: Received data:", responseData);
+        console.log("AuthContext: Starting login for:", username);
+        
+        // Викликаємо функцію з api/tmdbApi.ts
+        const responseData = await loginUser({ login: username, password: pass });
+        
         let userId: number;
         let userData: User;
+
         if (typeof responseData === 'object' && responseData !== null && 'user_id' in responseData) {
-            console.log("AuthContext: Login returned full user object!");
             userData = responseData as User;
             userId = userData.user_id;
         } else {
-            console.log("AuthContext: Login returned ID. Fetching profile...");
             userId = Number(responseData);
             userData = await getUserProfile(userId);
         }
+
+        // ОНОВЛЕННЯ СТАНУ (це змусить Navbar перерендеритись миттєво)
         setUser(userData);
+        
+        // Використовуємо ЄДИНИЙ ключ для всього додатка
         localStorage.setItem('cinelink_user_id', String(userId));
+        
+        // ПІДКЛЮЧАЄМО СОКЕТИ МИТТЄВО
+        RTClient.connect(userId);
 
     } catch (err: any) {
         console.error("AuthContext Error:", err);
         setError(err.message || "Login failed");
-        alert("Login error: " + err.message);
     } finally {
         setLoading(false);
     }

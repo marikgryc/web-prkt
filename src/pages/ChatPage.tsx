@@ -6,7 +6,9 @@ import { CURRENT_USER } from '../api/currentUser';
 import { API_URL } from '../api/API_CONFIG';
 import { useNavigate } from 'react-router-dom';
 import { GetUserChats } from '../api/chats';
-
+import { useUserStatus } from '../api/rt_client/managers/users_manager';
+import { useTypingStatus } from '../api/rt_client/managers/chats_manager'; 
+import { useLastChatMessage } from '../api/rt_client/managers/messages_manager';
 interface ChatMessage {
   message_id: number;
   chat_id: number;
@@ -15,16 +17,44 @@ interface ChatMessage {
   message: string;
   timestamp: string;
 }
+function ContactItem({ contact, isActive, onClick }: { contact: any, isActive: boolean, onClick: () => void }) {
+  const online = useUserStatus(contact.id); //
+  const typing = useTypingStatus(contact.id, contact.id); //
+  const lastMsg = useLastChatMessage(contact.id); //
 
+  return (
+    <div className={`contact-item ${isActive ? 'active' : ''}`} onClick={onClick}>
+      <div className="contact-avatar-wrapper">
+        <img src={contact.avatar} alt={contact.name} className="contact-avatar" />
+        {/* Використовуємо 'online' (те, що повернув хук) */}
+        {online && <span className="online-indicator"></span>}
+      </div>
+      <div className="contact-info">
+        <span className="contact-name">{contact.name}</span>
+        <span className="contact-preview">
+          {typing ? (
+            <span className="typing-text">typing...</span>
+          ) : (
+            //lastMsg.message береться з об'єкта Message_T
+            lastMsg?.message || contact.lastMessage || "No messages yet"
+          )}
+        </span>
+      </div>
+    </div>
+  );
+}
 export default function ChatPage() {
   const [inputText, setInputText] = useState('');
   const { id } = useParams<{ id: string }>(); // Отримуємо "3" з URL /chat/3
   const activeChatId = Number(id); // Перетворюємо на число для запитів
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const isOnline = useUserStatus(activeChatId); 
+  const isTyping = useTypingStatus(activeChatId, activeChatId); // для особистих чатів, де userID = chatID
   const [contacts, setContacts] = useState<{id: number, name: string, avatar: string, isOnline: boolean}[]>([]);
   const activeContact = contacts.find(c => c.id === activeChatId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isChatPeerOnline = useUserStatus(activeChatId);
 
   // Функція, яка плавно прокручує чат донизу
   const scrollToBottom = (smooth = true) => {
@@ -120,7 +150,31 @@ export default function ChatPage() {
 
     fetchContacts();
   }, []);
-
+  useEffect(() => {
+    // Підписуємося на всі вхідні повідомлення для оновлення прев'ю в списку
+    RTClient.addGlobalStatusListener((data) => {
+      if (data.type === "message") {
+        const { chat_id, message } = data.content;
+        
+        // Оновлюємо текст останнього повідомлення у списку контактів
+        setContacts(prevContacts => prevContacts.map(c => 
+          c.id === chat_id 
+            ? { ...c, lastMessage: typeof message === 'string' ? message : message.message } 
+            : c
+        ));
+      }
+    });
+  }, []);
+  useEffect(() => {
+  if (messages.length > 0 && activeChatId) {
+    const lastMsg = messages[messages.length - 1];
+    const text = typeof lastMsg.message === 'string' ? lastMsg.message : lastMsg.content?.message;
+    
+    setContacts(prev => prev.map(c => 
+      c.id === activeChatId ? { ...c, lastMessage: text } : c
+    ));
+  }
+}, [messages, activeChatId]);
   // 3. Відправка повідомлень
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,45 +240,41 @@ export default function ChatPage() {
 
   return (
     <div style={{ paddingTop: '70px', height: '100vh', boxSizing: 'border-box' }}>
+   
     <div className="chat-container">
       {/* ЛІВА ПАНЕЛЬ */}
       <div className="chat-sidebar">
-        <div className="sidebar-header">
-          <h2>Messages</h2>
-        </div>
-        <div className="contact-list">
-        {contacts.map(contact => (
-            <div 
-              key={contact.id} 
-              className={`contact-item ${activeChatId === contact.id ? 'active' : ''}`}
-              onClick={() => navigate(`/chat/${contact.id}`)} 
-            >
-              <div className="contact-avatar-wrapper">
-                <img src={contact.avatar} alt={contact.name} className="contact-avatar" />
-                {contact.isOnline && <span className="online-indicator"></span>}
-              </div>
-              <div className="contact-info">
-                <span className="contact-name">{contact.name}</span>
-                <span className="contact-preview">Last message...</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+  <div className="sidebar-header">
+    <h2>Messages</h2>
+  </div>
+  <div className="contact-list">
+    {contacts.map(contact => (
+      <ContactItem 
+        key={contact.id} 
+        contact={contact} 
+        isActive={activeChatId === contact.id}
+        onClick={() => navigate(`/chat/${contact.id}`)} 
+      />
+    ))}
+  </div>
+</div>
 
       {/* ПРАВА ПАНЕЛЬ */}
       <div className="chat-window">
         {activeContact ? (
           <>
-            <div className="chat-header">
-              <img src={activeContact.avatar} alt={activeContact.name} className="header-avatar" />
-              <div className="header-info">
-                <h3>{activeContact.name}</h3>
-                <p className="header-status">
-                  {isTyping ? <span className="typing-text">typing...</span> : (activeContact.isOnline ? 'Online' : 'Offline')}
-                </p>
-              </div>
-            </div>
+           <div className="header-info">
+      <h3>{activeContact?.name}</h3>
+      <p className="header-status">
+        {isTyping ? (
+          <span className="typing-text">typing...</span>
+        ) : (
+          <span className={isOnline ? "online" : "offline"}>
+            {isOnline ? "Online" : "Offline"}
+          </span>
+        )}
+      </p>
+    </div>
 
             <div className="messages-area">
             {messages.map((msg) => {

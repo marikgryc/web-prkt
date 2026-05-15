@@ -1,11 +1,10 @@
 /* Загальний контейнер */
 .chat-container {
-    display: flex;
-    height: calc(100vh - 70px); /* Віднімаємо висоту твоєї навігації (наприклад 70px) */
-    background-color: #121212;
-    color: #fff;
-    border-top: 1px solid #333;
-  }
+  display: flex;
+  flex: 1; /* Займає весь доступний простір під шапкою */
+  overflow: hidden; /* Важливо: сам контейнер не гортається */
+  height: calc(100vh - 70px); /* Висота екрана мінус висота вашого Navbar */
+}
   
   /* Сайдбар з контактами */
   .chat-sidebar {
@@ -216,4 +215,73 @@
     color: #666;
     font-size: 1.2rem;
   }
+  .avatar-wrapper {
+    position: relative;
+    display: inline-block;
+  }
   
+  .online-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background-color: #10b981; /* Зелений колір (Emerald) */
+    border: 2px solid #1a1a1a; /* Колір фону, щоб виділялося */
+    border-radius: 50%;
+  }
+  
+  .online-text {
+    font-size: 10px;
+    color: #10b981;
+    margin-left: 5px;
+    text-transform: lowercase;
+  }
+  .avatar-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .contact-avatar-wrapper {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0; /* Щоб аватар не стискався */
+    margin-right: 15px;
+  }
+  
+  .contact-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Стиль зеленої крапки */
+  .online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background-color: #10b981;
+    border: 2px solid #1a1a1a;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  
+  /* Запобігання вильоту тексту за межі панелі */
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+  }
+  
+  .contact-preview {
+    font-size: 0.85rem;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Три крапки, якщо текст довгий */
+  }

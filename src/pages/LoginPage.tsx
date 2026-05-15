@@ -2,56 +2,24 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../api/API_CONFIG";
 import { CURRENT_USER, updateCurrentUserData } from "../api/currentUser";
-
+import { useAuth } from "../context/AuthContext";
 export default function LoginPage() {
+  const { login } = useAuth(); // Використовуємо функцію з контексту
   const navigate = useNavigate();
-
-  // Використовуємо правильні назви стейтів
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          username: username, 
-          password: password 
-        }),
-      });
-
-      const data = await response.json();
-
-      // Тепер ми чітко бачимо, що треба писати data.results.user_id
-      if (response.ok && data.results && data.results.user_id) {
-        const user = data.results;
-
-        // 1. Зберігаємо ID та JWT (він вам знадобиться пізніше для захищених роутів)
-        localStorage.setItem('cinelink_user_id', String(user.user_id));
-        if (user.jwt) {
-          localStorage.setItem('jwt', user.jwt);
-        }
-        
-        // 2. Оновлюємо глобальний об'єкт CURRENT_USER відразу з результатів логіну
-        // Це швидше, ніж робити ще один запит на профіль
-        CURRENT_USER.UID = user.user_id;
-        CURRENT_USER.firstName = user.first_name || "";
-        CURRENT_USER.lastName = user.last_name || "";
-        CURRENT_USER.username = user.username || "";
-
-        console.log("Логін успішний, переходимо в чат...");
-        
-        // 3. ПЕРЕХІД
-        navigate('/chat/3'); 
-      } else {
-        alert(data.message || "Помилка авторизації");
-      }
+      // Цей виклик оновить AuthContext, збереже ID в localStorage і підключить WS
+      await login(username, password);
+      
+      // Перехід до чату
+      navigate('/profile'); 
     } catch (error) {
-      console.error("Помилка логіну:", error);
-      alert("Не вдалося з'єднатися з сервером");
+      // Помилка вже оброблена в AuthContext, тут можна просто вивести alert
+      console.error(error);
     }
   };
 
