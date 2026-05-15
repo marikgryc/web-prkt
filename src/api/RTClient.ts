@@ -1,6 +1,5 @@
 // src/api/RTClient.ts
 
-// 1. Описуємо типи даних з твого документа
 export type MessageType = 
   | "online" 
   | "typing" 
@@ -8,44 +7,58 @@ export type MessageType =
   | "chat_leaving" 
   | "page_entering" 
   | "page_leaving" 
-  | "message";
+  | "message"
+  | "ping"; // Додано ping з мобільного клієнта
 
 export interface RTMessagePayload {
     type: MessageType;
-    content: any;
+    content?: any; // Зробили опціональним, бо ping може не мати контенту
 }
 
-// 2. Створюємо сам клас
 class RealTimeClient {
     private ws: WebSocket | null = null;
     private userId: number | null = null;
     
-    // Тут ми будемо зберігати функції-колбеки, які React передасть нам
+    // Адреса без подвійних слешів. Беремо формат як у мобілці: /ws/{userID}
+    private BASE_WS_URL = "ws://113.30.191.198:8080"; 
+
+    // --- ЛОГІКА НАДІЙНОСТІ З МОБІЛЬНОГО КЛІЄНТА ---
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 5;
+    private pingInterval: ReturnType<typeof setInterval> | null = null;
+    private messagesQueue: RTMessagePayload[] = []; // Проста черга
+
+    // Колбеки для React
     private onMessageCallbacks: Map<number, (msg: any) => void> = new Map();
     private onTypingCallbacks: Map<number, (msg: any) => void> = new Map();
     private globalStatusCallbacks: ((msg: any) => void)[] = [];
 
-    // ЗМІНИ ЦЮ АДРЕСУ НА ТУ, ЯКА У ТВОЄМУ GO-СЕРВЕРІ
-    // Зазвичай це ws://IP:PORT/ws
-    private WS_URL = "ws://185.227.108.14:8080/ws"; 
-
-    // --- ОСНОВНІ МЕТОДИ ---
-
+    // --- ПІДКЛЮЧЕННЯ ---
     public connect(userId: number) {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            console.log("WS вже підключено");
+        if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
             return;
         }
 
         this.userId = userId;
         
-        // Підключаємося до сервера. Передаємо user_id, щоб сервер знав, хто це
-        this.ws = new WebSocket(`${this.WS_URL}?user_id=${userId}`);
+        // Формуємо URL точно як у мобільному клієнті (rt_client.ts)
+        const url = `${this.BASE_WS_URL}/ws/${userId}`;
+        console.log("Спроба підключення до WS:", url);
+        
+        this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
             console.log("✅ WebSocket підключено! User ID:", userId);
-            // Як тільки підключились, можемо сказати серверу, що ми онлайн
-            this.send("online", { user_id: userId, is_online: true });
+            this.reconnectAttempts = 0; // Скидаємо лічильник
+            
+            // Запускаємо Ping кожні 30 сек
+            this.startPing();
+
+            // Спершу повідомляємо, що ми онлайн
+            this.sendDirect("online", { user_id: userId, is_online: true });
+
+            // Виштовхуємо всі повідомлення, що накопичились у черзі, поки не було зв'язку
+            this.flushQueue();
         };
 
         this.ws.onmessage = (event) => {
@@ -58,9 +71,9 @@ class RealTimeClient {
         };
 
         this.ws.onclose = () => {
-            console.log("❌ WebSocket відключено. Спроба перепідключення...");
-            // Тут можна додати логіку автоматичного реконекту через 5 секунд
-            setTimeout(() => this.connect(userId), 5000);
+            console.warn("❌ WebSocket відключено.");
+            this.stopPing();
+            this.attemptReconnect();
         };
 
         this.ws.onerror = (error) => {
@@ -70,42 +83,101 @@ class RealTimeClient {
 
     public disconnect() {
         if (this.ws) {
-            // Кажемо серверу, що ми йдемо
             if (this.userId) {
-                this.send("online", { user_id: this.userId, is_online: false });
+                this.sendDirect("online", { user_id: this.userId, is_online: false });
             }
+            this.stopPing();
             this.ws.close();
             this.ws = null;
         }
     }
 
-    // --- ЛОГІКА ОБРОБКИ ПОВІДОМЛЕНЬ ВІД СЕРВЕРА ---
+    // --- АВТОРЕКОНЕКТ ТА PING (Адаптовано з ws_connector.ts) ---
+
+    private attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts && this.userId) {
+            this.reconnectAttempts++;
+            console.log(`Спроба перепідключення #${this.reconnectAttempts} через ${this.reconnectAttempts * 5} сек...`);
+            
+            setTimeout(() => {
+                this.connect(this.userId!);
+            }, 5000 * this.reconnectAttempts);
+        } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error("Ліміт спроб підключення вичерпано.");
+        }
+    }
+
+    private startPing() {
+        this.stopPing();
+        this.pingInterval = setInterval(() => {
+            this.sendDirect("ping", undefined);
+        }, 30000); // 30 секунд
+    }
+
+    private stopPing() {
+        if (this.pingInterval) {
+            clearInterval(this.pingInterval);
+            this.pingInterval = null;
+        }
+    }
+
+    // --- ЧЕРГА ТА ВІДПРАВКА ---
+
+    // Публічний метод, яким користується React. Якщо немає зв'язку - кладе в чергу
+    public send(type: MessageType, content: any) {
+        const payload: RTMessagePayload = { type, content };
+        
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(payload));
+        } else {
+            console.log("WS не підключено. Повідомлення додано в чергу:", type);
+            this.messagesQueue.push(payload);
+        }
+    }
+
+    // Пряма відправка (внутрішня) без черги
+    private sendDirect(type: MessageType, content: any) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({ type, content }));
+        }
+    }
+
+    private flushQueue() {
+        if (this.messagesQueue.length > 0) {
+            console.log(`Відправка ${this.messagesQueue.length} повідомлень з черги...`);
+            this.messagesQueue.forEach(msg => {
+                this.ws?.send(JSON.stringify(msg));
+            });
+            this.messagesQueue = []; // Очищаємо чергу
+        }
+    }
+
+    // --- ОБРОБКА ВХІДНИХ ПОВІДОМЛЕНЬ ---
 
     private handleIncomingEvent(data: RTMessagePayload) {
-        console.log("📩 Нове WS повідомлення:", data.type, data.content);
+        // ігноруємо pong/ping для логів, щоб не спамити консоль
+        if (data.type !== 'ping') {
+            console.log("📩 Нове WS повідомлення:", data.type, data.content);
+        }
 
         switch (data.type) {
             case "message":
-                // Шукаємо, чи є колбек для цього чату
-                const msgCallback = this.onMessageCallbacks.get(data.content.chat_id);
+                const msgCallback = this.onMessageCallbacks.get(data.content?.chat_id);
                 if (msgCallback) msgCallback(data.content);
                 break;
-
             case "typing":
-                const typeCallback = this.onTypingCallbacks.get(data.content.chat_id);
+                const typeCallback = this.onTypingCallbacks.get(data.content?.chat_id);
                 if (typeCallback) typeCallback(data.content);
                 break;
-
             case "online":
             case "chat_entering":
             case "chat_leaving":
-                // Ці події кидаємо у глобальні слухачі (для оновлення статусів у сайдбарі)
                 this.globalStatusCallbacks.forEach(cb => cb(data));
                 break;
         }
     }
 
-    // --- МЕТОДИ ВСТАНОВЛЕННЯ КОЛБЕКІВ (Згідно з твоїм доком) ---
+    // --- МЕТОДИ ДЛЯ REACT (Підписка) ---
 
     public setOnMessageCallback(chatId: number, callback: (msg: any) => void) {
         this.onMessageCallbacks.set(chatId, callback);
@@ -118,18 +190,6 @@ class RealTimeClient {
     public addGlobalStatusListener(callback: (msg: any) => void) {
         this.globalStatusCallbacks.push(callback);
     }
-
-    // --- МЕТОДИ ДЛЯ ВІДПРАВКИ НА СЕРВЕР ---
-
-    public send(type: MessageType, content: any) {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            const payload: RTMessagePayload = { type, content };
-            this.ws.send(JSON.stringify(payload));
-        } else {
-            console.warn("Не вдалося відправити повідомлення. WS не підключено.");
-        }
-    }
 }
 
-// Експортуємо єдиний екземпляр класу (Singleton)
 export const RTClient = new RealTimeClient();
