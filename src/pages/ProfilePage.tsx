@@ -136,24 +136,29 @@ export default function ProfilePage() {
 
         {/* Секція контенту залежно від обраної вкладки */}
         <div className="posts-section">
-          {activeTab === 'Wishlist' || activeTab === 'Playlist' ? (
+          {activeTab === 'Playlist' ? (
             <div className="watchlists-container" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
               {watchlists.length > 0 ? (
-                watchlists.map(list => (
-                  <div 
-                    key={list.id} 
-                    className="watchlist-card" 
-                    style={{ 
-                      padding: '15px', 
-                      border: '1px solid #ccc', 
-                      borderRadius: '8px', 
-                      minWidth: '200px' 
-                    }}
-                  >
-                    <h4 style={{ margin: '0 0 10px 0' }}>{list.name}</h4>
-                    <p style={{ margin: 0, color: '#666' }}>Кількість фільмів: {list.movies_quantity || 0}</p>
-                  </div>
-                ))
+               watchlists.map(list => (
+                <div 
+                  key={list.id} 
+                  className="watchlist-card"
+                  onClick={() => navigate(`/watchlist/${list.id}`)} // <--- ДОДАНО ПЕРЕХІД
+                  style={{ 
+                    padding: '15px', 
+                    border: '1px solid #ccc', 
+                    borderRadius: '8px', 
+                    minWidth: '200px',
+                    cursor: 'pointer', // <--- ДОДАНО КУРСОР
+                    transition: 'transform 0.2s' // Можна додати для краси
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <h4 style={{ margin: '0 0 10px 0' }}>{list.name}</h4>
+                  <p style={{ margin: 0, color: '#666' }}>Кількість фільмів: {list.movies_quantity || 0}</p>
+                </div>
+              ))
               ) : (
                 <div style={{ color: '#666', fontSize: '1.1rem' }}>Немає збережених списків.</div>
               )}

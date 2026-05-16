@@ -11,6 +11,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';
 import ChatPage from './pages/ChatPage';
+import WatchlistPage from './pages/WatchlistPage';
 import { ChatsManager } from './api/rt_client/managers/chats_manager';
 import { UsersManager } from './api/rt_client/managers/users_manager';
 import { WatchlistsManager } from './api/rt_client/managers/watchlists_manager';
@@ -49,6 +50,7 @@ useEffect(() => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/chat/:id" element={<ChatPage />} />
+          <Route path="/watchlist/:id" element={<WatchlistPage />} />
         </Routes>
       </AnimatePresence>
       <Footer />
