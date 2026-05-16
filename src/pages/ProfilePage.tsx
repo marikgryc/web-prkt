@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getUserProfile, User } from '../api/tmdbApi';
+import { GetUserWatchlists } from '../api/watchlist/watchlist'; // ДОДАНО ІМПОРТ
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -11,11 +12,15 @@ export default function ProfilePage() {
 
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [fetching, setFetching] = useState(false);
-  const [activeTab, setActiveTab] = useState('Posts');
+  const [activeTab, setActiveTab] = useState('Wishlist'); // За замовчуванням відкриємо Wishlist
 
+  // Стан для списків (вотчлістів)
+  const [watchlists, setWatchlists] = useState<any[]>([]);
+
+  // 1. Завантаження профілю
   useEffect(() => {
     const loadProfile = async () => {
-      if (authLoading) return; // Чекаємо, поки AuthContext відновить сесію
+      if (authLoading) return;
 
       try {
         if (id) {
@@ -35,6 +40,20 @@ export default function ProfilePage() {
     loadProfile();
   }, [id, currentUser, authLoading]);
 
+  // 2. Завантаження вотчлістів, коли профіль вже завантажено
+  useEffect(() => {
+    async function loadWatchlists() {
+      // Якщо користувач завантажився і в нього є user_id
+      if (profileUser?.user_id) {
+        const lists = await GetUserWatchlists(profileUser.user_id);
+        if (lists?.length) {
+          setWatchlists(lists);
+        }
+      }
+    }
+    loadWatchlists();
+  }, [profileUser]); // Викликаємо щоразу, коли змінюється profileUser
+
   if (authLoading || fetching) {
     return <div className="loading-text">Loading profile...</div>;
   }
@@ -43,7 +62,6 @@ export default function ProfilePage() {
     return <div className="loading-text">User not found. Please log in.</div>;
   }
 
-  // Оголошуємо змінні ТУТ, щоб не було ReferenceError
   const isMyProfile = currentUser?.user_id === profileUser.user_id;
   const avatarUrl = profileUser.avatar_url || "https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png";
   const bgUrl = profileUser.bg_img_url; 
@@ -116,11 +134,37 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* Секція контенту залежно від обраної вкладки */}
         <div className="posts-section">
-          <div style={{color: '#666', fontSize: '1.2rem', marginTop: '20px'}}>
-              Content for <b>{activeTab}</b> will appear here.
-          </div>
+          {activeTab === 'Wishlist' || activeTab === 'Playlist' ? (
+            <div className="watchlists-container" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
+              {watchlists.length > 0 ? (
+                watchlists.map(list => (
+                  <div 
+                    key={list.id} 
+                    className="watchlist-card" 
+                    style={{ 
+                      padding: '15px', 
+                      border: '1px solid #ccc', 
+                      borderRadius: '8px', 
+                      minWidth: '200px' 
+                    }}
+                  >
+                    <h4 style={{ margin: '0 0 10px 0' }}>{list.name}</h4>
+                    <p style={{ margin: 0, color: '#666' }}>Кількість фільмів: {list.movies_quantity || 0}</p>
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: '#666', fontSize: '1.1rem' }}>Немає збережених списків.</div>
+              )}
+            </div>
+          ) : (
+            <div style={{color: '#666', fontSize: '1.2rem', marginTop: '20px'}}>
+                Content for <b>{activeTab}</b> will appear here.
+            </div>
+          )}
         </div>
+
       </div>
     </div>
   );

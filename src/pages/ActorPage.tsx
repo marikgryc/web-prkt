@@ -22,6 +22,7 @@ export default function ActorPage() {
   if (!actor) return <div className="loading">Loading...</div>;
 
   return (
+    
     <div className="actor-page-container">
       <div className="actor-card">
         

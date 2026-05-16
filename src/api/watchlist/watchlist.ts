@@ -1,27 +1,79 @@
-import { API_URL } from "@/api/API_CONFIG";
+// src/api/watchlist/watchlist.ts
+import { API_URL } from "../API_CONFIG";
 import { CURRENT_USER } from "../currentUser";
-import { WatchlistItem, WatchlistCard } from "./types";
+import { WatchlistItem_T, WatchlistCard } from "./types";
 
-export async function AddWatchlistItem(item: WatchlistItem) {
-  await fetch(`${API_URL}/user/watchlist`, {
-    method: "POST",
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(item),
-  })
-    .then(res => res.json)
-    .then(data => console.log(data))
-    .catch(err => console.error(err));
-
-  console.log("AddWatchlistItem");
+// Допоміжна функція для отримання токена (адаптуй під те, як ти зберігаєш JWT на вебі)
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('jwt'); // Або 'access_token', залежить від твого AuthContext
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
+
+export async function AddWatchlistItem(item: WatchlistItem_T) {
+  try {
+    const response = await fetch(`${API_URL}/user/watchlist`, {
+      method: "POST",
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeaders() 
+      },
+      body: JSON.stringify(item),
+    });
+    const data = await response.json();
+    console.log("AddWatchlistItem result:", data);
+    return data;
+  } catch (err) {
+    console.error("Помилка AddWatchlistItem:", err);
+  }
+}
 
 export async function GetUserWatchlists(userID: number) {
-  const response = await fetch(`${API_URL}/watchlist?userID=${userID}`)
-  return response.json();
-};
+  try {
+    const response = await fetch(`${API_URL}/users/${userID}/watchlists`);
+    const data = await response.json();
+    return data?.results || data; 
+  } catch (err) {
+    console.error("Помилка GetUserWatchlists:", err);
+    return [];
+  }
+}
 
 export async function GetWatchlistMovies(watchlistID: number) {
-  console.log("watchlist id: ", watchlistID);
-  const response = await fetch(`${API_URL}/watchlist?watchlistID=${watchlistID}`)
-  return response.json();
-};
+  try {
+    console.log("Fetching movies for watchlist id: ", watchlistID);
+    const response = await fetch(`${API_URL}/watchlists/${watchlistID}`);
+    const data = await response.json();
+    return data?.results || data;
+  } catch (err) {
+    console.error("Помилка GetWatchlistMovies:", err);
+    return [];
+  }
+}
+
+export async function CreateWatchlist(name: string): Promise<boolean> {
+  const userID = CURRENT_USER.UID;
+  console.log("Creating watchlist for user: ", userID);
+  
+  try {
+    const response = await fetch(`${API_URL}/users/${userID}/watchlists`, {
+      method: "POST",
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeaders() // Передаємо токен, як на мобілці
+      },
+      // Відправляємо назву (і можливо інші дефолтні поля)
+      body: JSON.stringify({ name: name, is_public: true }), 
+    });
+
+    if (response.ok) {
+      console.log("Створено успішно!");
+      return true;
+    } else {
+      console.error("Помилка сервера:", response.status);
+      return false;
+    }
+  } catch (err) {
+    console.error("Помилка CreateWatchlist:", err);
+    return false;
+  }
+}

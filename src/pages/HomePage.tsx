@@ -71,10 +71,7 @@ export default function HomePage() {
       </h1>
 
       <div className="banner-buttons">
-        {/* Кнопка Play може вести на трейлер або сторінку фільму */}
-        <button className="banner-button btn-play">Play</button>
-        
-        {/* Використовуємо movie_id, як у твоїй структурі MovieOfTheDay */}
+      
         <Link to={`/movie/${heroMovie.movie_id}`}>
           <button className="banner-button">More Info</button>
         </Link>
