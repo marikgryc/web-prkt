@@ -3,7 +3,7 @@ export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
-export const MY_BACKEND_URL = 'http://113.30.191.198:8080/';
+export const MY_BACKEND_URL = 'https://api.cinelink.lol/';
 //http://113.30.191.198:808/
 const tmdbClient = axios.create({
     baseURL: BASE_URL,
@@ -104,9 +104,7 @@ export const fetchMovieOfTheDay = async () => {
 };
 export const getSimilarMovies = async (id: number) => {
     try {
-        // Запит до вашого бекенду
         const response = await myBackendClient.get(`/movies/${id}/similar`);
-        // Згідно з вашою структурою, результати лежать в response.data.results
         return response.data.results || [];
     } catch (error) {
         console.error("Error fetching similar movies:", error);
@@ -115,46 +113,37 @@ export const getSimilarMovies = async (id: number) => {
 };
 // --- API ЗАПИТИ ---
 
-// УВАГА: Цей запит (/login) не спрацює з API TMDB. 
-// Це для твого власного бекенду. Якщо бекенду немає, закоментуй це.
 export const loginUser = async (loginData: { login: string; password: string }) => {
     try {
-        console.log("🔐 Логін: відправка даних...", loginData);
+        console.log(" Логін: відправка даних...", loginData);
 
-        const response = await axios.post('http://113.30.191.198:8080/login', {
+        const response = await axios.post('https://api.cinelink.lol/login', {
             username: loginData.login,
             password: loginData.password
         });
 
-        console.log("✅ Сервер відповів:", response.data);
+        console.log(" Сервер відповів:", response.data);
 
-        // 1. Перевіряємо, чи є results і чи це масив
+        // 1. Перевіряємо,  є results і чи це масив
         const results = response.data.results;
 
         if (!results || (Array.isArray(results) && results.length === 0)) {
             throw new Error("Сервер не повернув даних користувача");
         }
 
-        // 2. Беремо першого користувача зі списку
-        // Якщо results це масив, беремо results[0]. Якщо об'єкт — то його самого.
+   
         const userFromServer = Array.isArray(results) ? results[0] : results;
 
-        console.log("👤 Дані юзера для фронта:", userFromServer);
+        console.log("Дані юзера", userFromServer);
 
-        // 3. Мапимо дані під твій інтерфейс User
-        // Зверни увагу: полів followers та bg_img_url немає у відповіді сервера, 
-        // тому я додав безпечні значення за замовчуванням.
+      
         return {
             user_id: userFromServer.user_id,
             username: userFromServer.username,
             first_name: userFromServer.first_name || "",
             last_name: userFromServer.last_name || "",
             email: userFromServer.email || "",
-
-            // Аватарка з сервера, або заглушка
             avatar_url: userFromServer.avatar_url || "https://via.placeholder.com/150",
-
-            // Цих полів сервер поки не віддає, тому ставимо дефолтні:
             followers: userFromServer.followers || 0,
             followings: userFromServer.followings || 0,
             bio: userFromServer.bio || "Кіноман",
@@ -166,19 +155,16 @@ export const loginUser = async (loginData: { login: string; password: string }) 
         throw error;
     }
 };
-// Це теж для власного бекенду (/users/id)
+
 export const getUserProfile = async (id: number) => {
     try {
 
-        // Поки бекенд не підтримує стабільний запит /users/:id, 
-        // вантажимо всіх юзерів і фільтруємо локально.
         
         const response = await myBackendClient.get('/users');
         
-        // Залежно від того, як бекенд віддає масив (в results чи напряму)
+     
         const allUsers = response.data.results || response.data;
         
-        // Шукаємо нашого юзера
         const currentUser = allUsers.find((user: any) => user.user_id === id);
         
         if (!currentUser) {

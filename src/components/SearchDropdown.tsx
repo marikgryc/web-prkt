@@ -90,7 +90,7 @@ if (results && results.movies && results.movies.length > 0) {
                         <span className="search-item-name">{title}</span>
                         <span className="search-item-meta">
     ⭐ {
-        // Перевіряємо обидва варіанти: і imdb_rating, і vote_average
+       
         (() => {
             const rating = movie.imdb_rating ?? movie.vote_average;
             return (rating !== undefined && rating !== null && rating !== 0) 

@@ -4,7 +4,7 @@ import { API_URL } from "../api/API_CONFIG";
 import { CURRENT_USER, updateCurrentUserData } from "../api/currentUser";
 import { useAuth } from "../context/AuthContext";
 export default function LoginPage() {
-  const { login } = useAuth(); // Використовуємо функцію з контексту
+  const { login } = useAuth(); 
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,13 +12,9 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Цей виклик оновить AuthContext, збереже ID в localStorage і підключить WS
       await login(username, password);
-      
-      // Перехід до чату
       navigate('/profile'); 
     } catch (error) {
-      // Помилка вже оброблена в AuthContext, тут можна просто вивести alert
       console.error(error);
     }
   };
@@ -31,8 +27,7 @@ export default function LoginPage() {
         <p className="auth-subtitle">Welcome back! Please enter your details.</p>
         
         <form onSubmit={handleLogin}>
-          
-          {/* Поле Username */}
+ 
           <div className="form-group">
             <label className="form-label">Username</label>
             <input 
@@ -45,7 +40,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Поле Password */}
           <div className="form-group">
             <label className="form-label">Password</label>
             <input 

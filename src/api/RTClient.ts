@@ -20,7 +20,7 @@ class RealTimeClient {
     private userId: number | null = null;
     
     // Адреса без подвійних слешів. Беремо формат як у мобілці: /ws/{userID}
-    private BASE_WS_URL = "ws://113.30.191.198:8080"; 
+    private BASE_WS_URL = "ws://api.cinelink.lol"; 
 
     // --- ЛОГІКА НАДІЙНОСТІ З МОБІЛЬНОГО КЛІЄНТА ---
     private reconnectAttempts = 0;
@@ -54,7 +54,7 @@ class RealTimeClient {
         this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
-            console.log("✅ WebSocket підключено! User ID:", userId);
+            console.log(" WebSocket підключено! User ID:", userId);
             this.reconnectAttempts = 0; // Скидаємо лічильник
             
             // Запускаємо Ping кожні 30 сек
@@ -77,7 +77,7 @@ class RealTimeClient {
         };
 
         this.ws.onclose = () => {
-            console.warn("❌ WebSocket відключено.");
+            console.warn(" WebSocket відключено.");
             this.stopPing();
             this.attemptReconnect();
         };
@@ -163,7 +163,7 @@ class RealTimeClient {
     private handleIncomingEvent(data: RTMessagePayload) {
         // ігноруємо pong/ping для логів, щоб не спамити консоль
         if (data.type !== 'ping') {
-            console.log("📩 Нове WS повідомлення:", data.type, data.content);
+            console.log(" Нове WS повідомлення:", data.type, data.content);
         }
 
         switch (data.type) {

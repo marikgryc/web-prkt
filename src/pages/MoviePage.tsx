@@ -59,7 +59,7 @@ const MoviePage: React.FC = () => {
 
           setMovie(movieData);
           setCast(creditsData.slice(0, 12));
-          setSimilarMovies(similarData); // Тепер ця змінна існує і працює!
+          setSimilarMovies(similarData); 
         }
       } catch (error) {
         console.error("Помилка завантаження:", error);

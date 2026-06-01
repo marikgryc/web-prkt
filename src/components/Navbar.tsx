@@ -38,7 +38,7 @@ export default function Navbar() {
         <div className="nav-links">
            <Link to="/">Home</Link>
            {isAuthenticated && <Link to="/profile">My List</Link>}
-           {isAuthenticated && <Link to="/chat/1">Chats</Link>}
+           {isAuthenticated && <Link to="/chat/3">Chats</Link>}
         </div>
 
         {/* 👇 ОСЬ ТУТ ДОДАЄМО КОМПОНЕНТ ПОШУКУ 👇 */}

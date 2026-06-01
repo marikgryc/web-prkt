@@ -9,15 +9,10 @@ export default function ProfilePage() {
   const { id } = useParams<{ id: string }>(); 
   const { user: currentUser, loading: authLoading, logout } = useAuth();
   const navigate = useNavigate();
-
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [fetching, setFetching] = useState(false);
-  const [activeTab, setActiveTab] = useState('Wishlist'); // За замовчуванням відкриємо Wishlist
-
-  // Стан для списків (вотчлістів)
+  const [activeTab, setActiveTab] = useState('Playlist'); 
   const [watchlists, setWatchlists] = useState<any[]>([]);
-
-  // 1. Завантаження профілю
   useEffect(() => {
     const loadProfile = async () => {
       if (authLoading) return;
@@ -39,11 +34,8 @@ export default function ProfilePage() {
 
     loadProfile();
   }, [id, currentUser, authLoading]);
-
-  // 2. Завантаження вотчлістів, коли профіль вже завантажено
   useEffect(() => {
     async function loadWatchlists() {
-      // Якщо користувач завантажився і в нього є user_id
       if (profileUser?.user_id) {
         const lists = await GetUserWatchlists(profileUser.user_id);
         if (lists?.length) {
@@ -52,7 +44,7 @@ export default function ProfilePage() {
       }
     }
     loadWatchlists();
-  }, [profileUser]); // Викликаємо щоразу, коли змінюється profileUser
+  }, [profileUser]);
 
   if (authLoading || fetching) {
     return <div className="loading-text">Loading profile...</div>;
@@ -134,7 +126,6 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Секція контенту залежно від обраної вкладки */}
         <div className="posts-section">
           {activeTab === 'Playlist' ? (
             <div className="watchlists-container" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
@@ -149,8 +140,8 @@ export default function ProfilePage() {
                     border: '1px solid #ccc', 
                     borderRadius: '8px', 
                     minWidth: '200px',
-                    cursor: 'pointer', // <--- ДОДАНО КУРСОР
-                    transition: 'transform 0.2s' // Можна додати для краси
+                    cursor: 'pointer', 
+                    transition: 'transform 0.2s' 
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}

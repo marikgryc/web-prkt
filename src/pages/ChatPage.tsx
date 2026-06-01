@@ -43,10 +43,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [isTyping, setIsTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Наш таймер вводу
-  const incomingTypingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // ФІКС 1: Окремий таймер для співрозмовника
-
-  // Беремо онлайн-статус прямо зі списку контактів (щоб було синхронно)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
+  const incomingTypingTimeoutRef = useRef<NodeJS.Timeout | null>(null); 
   const isPeerOnline = activeContact?.isOnline || false;
 
   const scrollToBottom = (smooth = true) => {
@@ -97,17 +95,14 @@ export default function ChatPage() {
       setMessages(prev => [...prev, newMsg]);
     });
 
-    // ФІКС 1: Правильна обробка "друкує" з очищенням таймера
+  
     RTClient.setOnTypingCallback(activeChatId, (typingData: any) => {
       if (Number(typingData.user_id) !== Number(CURRENT_USER.UID)) {
         setIsTyping(typingData.is_typing);
-        
-        // Очищаємо попередній таймер відключення, якщо людина все ще пише
+ 
         if (incomingTypingTimeoutRef.current) {
           clearTimeout(incomingTypingTimeoutRef.current);
         }
-        
-        // Якщо вона пише, заводимо таймер на 3 сек, щоб скинути статус
         if (typingData.is_typing) {
           incomingTypingTimeoutRef.current = setTimeout(() => {
             setIsTyping(false);
@@ -115,7 +110,6 @@ export default function ChatPage() {
         }
       }
     });
-
     return () => {
       RTClient.send("chat_leaving", { 
         user_id: CURRENT_USER.UID, 
@@ -130,14 +124,12 @@ export default function ChatPage() {
         const chatsData = await GetUserChats(CURRENT_USER.UID);
         if (chatsData) {
           const loadedContacts = chatsData.map((chat: any) => {
-            // ФІКС 2: Витягуємо peer_id (ID співрозмовника) з даних бекенду
             const peerId = chat.peer_id?.Valid ? chat.peer_id.Int32 : (chat.peer_id || null);
-
             return {
               id: chat.chat_id || chat.id,
               name: chat.name || chat.title || `Чат #${chat.chat_id || chat.id}`,
               avatar: chat.img_url || chat.avatar_url || `https://i.pravatar.cc/150?u=${chat.chat_id || chat.id}`,
-              peer_id: peerId, // ЗБЕРІГАЄМО ЙОГО
+              peer_id: peerId, 
               isOnline: false,
               lastMessage: ""
             };
@@ -164,14 +156,9 @@ export default function ChatPage() {
       } else if (data.type === "online" || data.type === "chat_entering") {
          const incomingUserId = data.content?.user_id;
          const statusOnline = data.type === "online" ? data.content?.is_online : true;
-
-         // Шукаємо контакт по peer_id і оновлюємо його статус
          setContacts(prevContacts => prevContacts.map(c => 
            c.peer_id === incomingUserId ? { ...c, isOnline: statusOnline } : c
          ));
-
-         // ФІКС 3: Ехо-відповідь ("Я теж тут!")
-         // Якщо хтось інший зайшов, маякнемо йому, що ми онлайн, щоб він це побачив
          if (data.type === "chat_entering" && incomingUserId !== CURRENT_USER.UID) {
            RTClient.send("online", { user_id: CURRENT_USER.UID, is_online: true });
          }
