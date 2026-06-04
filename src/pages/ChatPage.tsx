@@ -62,9 +62,14 @@ export default function ChatPage() {
 
     const fetchChatHistory = async () => {
       try {
-        const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`);
+        const token = localStorage.getItem('jwt_token');
+        const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : ""
+          }
+        });
         const data = await response.json();
-        
         if (data && data.results) {
           const normalized = data.results.map((m: any) => ({
             ...m,
@@ -120,6 +125,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     const fetchContacts = async () => {
+      // Перевіряємо, чи є валідний UID користувача, перш ніж робити запит
+      if (!CURRENT_USER?.UID || CURRENT_USER.UID === 0) {
+        return; 
+      }
+
       try {
         const chatsData = await GetUserChats(CURRENT_USER.UID);
         if (chatsData) {
@@ -142,7 +152,7 @@ export default function ChatPage() {
     };
 
     fetchContacts();
-  }, []);
+  }, [CURRENT_USER?.UID]);
 
   useEffect(() => {
     RTClient.addGlobalStatusListener((data) => {
@@ -200,9 +210,13 @@ export default function ChatPage() {
     RTClient.send("message", newMessage);
 
     try {
+      const token = localStorage.getItem('jwt_token');
       const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : ""
+        },
         body: JSON.stringify({
           type: "message",
           content: {

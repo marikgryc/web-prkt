@@ -85,6 +85,17 @@ export interface WatchlistSearch {
   movies_quantity: number;
 }
 
+myBackendClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+        // Найчастіше бекенд очікує формат "Bearer <token>", але спитайте бекендера, чи потрібно слово Bearer
+        config.headers.Authorization = `Bearer ${token}`; 
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 // Головна структура відповіді
 export interface SearchResults {
   movies: MovieSearchItem[] | null;
@@ -115,29 +126,29 @@ export const getSimilarMovies = async (id: number) => {
 
 export const loginUser = async (loginData: { login: string; password: string }) => {
     try {
-        console.log(" Логін: відправка даних...", loginData);
-
         const response = await axios.post('https://api.cinelink.lol/login', {
             username: loginData.login,
             password: loginData.password
         });
 
-        console.log(" Сервер відповів:", response.data);
-
-        // 1. Перевіряємо,  є results і чи це масив
         const results = response.data.results;
 
         if (!results || (Array.isArray(results) && results.length === 0)) {
             throw new Error("Сервер не повернув даних користувача");
         }
 
-   
         const userFromServer = Array.isArray(results) ? results[0] : results;
 
-        console.log("Дані юзера", userFromServer);
+        const token = userFromServer.jwt; 
+        
+        if (token) {
+            localStorage.setItem('jwt_token', token);
+            console.log("Токен успішно збережено!");
+        } else {
+            console.warn("Токен не знайдено у відповіді сервера!");
+        }
 
-      
-        return {
+        const userData = {
             user_id: userFromServer.user_id,
             username: userFromServer.username,
             first_name: userFromServer.first_name || "",
@@ -146,16 +157,17 @@ export const loginUser = async (loginData: { login: string; password: string }) 
             avatar_url: userFromServer.avatar_url || "https://via.placeholder.com/150",
             followers: userFromServer.followers || 0,
             followings: userFromServer.followings || 0,
-            bio: userFromServer.bio || "Кіноман",
+            bio: userFromServer.bio || "",
             bg_img_url: userFromServer.bg_img_url || "https://via.placeholder.com/1920x600/1a1a1a/ffffff?text=No+Cover"
         };
+
+        return userData;
 
     } catch (error: any) {
         console.error("❌ Помилка входу:", error.response?.data || error.message);
         throw error;
     }
 };
-
 export const getUserProfile = async (id: number) => {
     try {
 
