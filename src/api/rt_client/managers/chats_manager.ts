@@ -95,13 +95,29 @@ export class ChatsManager extends EntinyManager<Chat_T> {
   };
 
   public async load(userID: UserID = 0) {
-    const resp = await fetch(`${API_URL}/users/${this.currUserID}/chats`);
-    const data = await resp.json();
-    if(!resp.ok || data?.status !== 200)
-      return;
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const resp = await fetch(`${API_URL}/users/${this.currUserID}/chats`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+      
+      if(!resp.ok) {
+        const errorText = await resp.text();
+        console.error("Chats load err: ", resp.status, errorText);
+        return;
+      }
 
-    const map = new Map<number, Chat_T>(data?.results?.map((chat: Chat_T)=> [chat.chat_id, chat]));
-    useChatStore.getState()._addMany(map);
+      const data = await resp.json();
+      if(data?.status !== 200) return;
+
+      const map = new Map<number, Chat_T>(data?.results?.map((chat: Chat_T)=> [chat.chat_id, chat]));
+      useChatStore.getState()._addMany(map);
+    } catch (error) {
+      console.error("Fetch error in ChatsManager:", error);
+    }
   };
 
   public setTypingStatus(chatID: ChatID, userID: UserID, status: boolean){

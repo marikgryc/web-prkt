@@ -69,8 +69,16 @@ export default function ChatPage() {
             "Authorization": token ? `Bearer ${token}` : ""
           }
         });
+        
+        if (!response.ok) {
+          console.error("Помилка сервера при отриманні повідомлень:", response.status);
+          return;
+        }
+
         const data = await response.json();
-        if (data && data.results) {
+        
+        // ГОЛОВНА ЗМІНА: Перевіряємо, чи data.results дійсно є масивом
+        if (data && Array.isArray(data.results)) {
           const normalized = data.results.map((m: any) => ({
             ...m,
             sender_id: m.user_id || m.sender_id,
@@ -81,6 +89,10 @@ export default function ChatPage() {
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
           }, 0);
+        } else {
+          // Якщо бекенд повернув null або щось інше (наприклад, повідомлень ще немає)
+          console.log("Повідомлень ще немає або нестандартна відповідь сервера:", data);
+          setMessages([]); // Ставимо пустий масив, щоб не ламався UI
         }
       } catch (error) {
         console.error("Помилка завантаження історії:", error);

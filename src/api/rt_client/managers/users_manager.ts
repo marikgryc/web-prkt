@@ -64,25 +64,41 @@ export class UsersManager extends EntinyManager<User_T> {
       UsersManager.instance = new UsersManager();
     return UsersManager.instance;
   };
-
   public init(userID: UserID){
     this.currUserID = userID;
     this.load();
   };
 
+  
   public async load(userID: UserID = 0) {
     if(this.isLoading) return;
 
     this.isLoading = true;
     try {
+      const token = localStorage.getItem('jwt_token');
+      const fetchOptions = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      };
+
       let resp: any;
       if(!userID)
-        resp = await fetch(`${API_URL}/users/init/${this.currUserID}`);
+        resp = await fetch(`${API_URL}/users/init/${this.currUserID}`, fetchOptions);
       else 
-        resp = await fetch(`${API_URL}/users/${userID}`);
+        resp = await fetch(`${API_URL}/users/${userID}`, fetchOptions);
+      
+      if(!resp.ok){
+        const errorText = await resp.text();
+        console.error("Users init err: ", resp.status, errorText);
+        return;
+      }
+
       const data = await resp.json();
-      if(!resp.ok || data?.status !== 200){
-        console.log("Users init err: ", resp);
+      
+      if(data?.status !== 200){
+        console.log("Users init status err: ", data);
         return;
       };
 
@@ -94,12 +110,13 @@ export class UsersManager extends EntinyManager<User_T> {
           user.avatar_url = "https://i.pinimg.com/736x/56/65/e3/5665e34f05ce5e1270b81ee0f64922f3.jpg";
         map.set(user.user_id, user);
         statuses.set(user.user_id, user.is_online);
-        console.log("user ", user?.user_id, " is online: ", user.is_online);
       });
 
       useUserStore.getState()._addMany(map);
       useUserStore.getState()._setManyOnlineStatus(statuses);
-    }finally{
+    } catch (error) {
+      console.error("Fetch error in UsersManager:", error);
+    } finally {
       this.isLoading = false;
     }
   };

@@ -58,22 +58,42 @@ export class WatchlistsManager extends EntinyManager<Watchlist_T> {
   };
 
   public async load(watchlistID: WatchlistID = 0) {
-    let resp:any;
-    if(!watchlistID)
-      resp = await fetch(`${API_URL}/users/${this.currUserID}/watchlists`);
-    const data = await resp.json();
-    if(!resp.ok || data?.status !== 200)
-      return;
+    try {
+      let resp:any;
+      const token = localStorage.getItem('jwt_token');
+      const fetchOptions = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      };
 
-    const current =  useWatchlistStore.getState().watchlists;
-    const map = new Map<number, Watchlist_T>(data?.results?.map((item: Watchlist_T)=> [item.id, item]));
-    const same = 
-      Object.keys(current).length === map.size 
-      && [...map.keys()].every(id => current[id]);
+      if(!watchlistID)
+        resp = await fetch(`${API_URL}/users/${this.currUserID}/watchlists`, fetchOptions);
+      else
+        return; 
 
-    if(!same)
-      useWatchlistStore.getState()._addMany(map);
-  };
+      if(!resp?.ok) {
+        const errorText = await resp.text();
+        console.error("Watchlists load err: ", resp.status, errorText);
+        return;
+      }
+
+      const data = await resp.json();
+      if(data?.status !== 200) return;
+
+      const current =  useWatchlistStore.getState().watchlists;
+      const map = new Map<number, Watchlist_T>(data?.results?.map((item: Watchlist_T)=> [item.id, item]));
+      const same = 
+        Object.keys(current).length === map.size 
+        && [...map.keys()].every(id => current[id]);
+
+      if(!same)
+        useWatchlistStore.getState()._addMany(map);
+    } catch (error) {
+      console.error("Fetch error in WatchlistsManager:", error);
+    }
+  };  
 
   public add(watchlistID: WatchlistID, watchlist: any){
     useWatchlistStore.getState()._add(watchlistID, watchlist);
