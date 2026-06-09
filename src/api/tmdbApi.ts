@@ -170,17 +170,13 @@ export const loginUser = async (loginData: { login: string; password: string }) 
 };
 export const getUserProfile = async (id: number) => {
     try {
-
-        
-        const response = await myBackendClient.get('/users');
-        
-     
-        const allUsers = response.data.results || response.data;
-        
-        const currentUser = allUsers.find((user: any) => user.user_id === id);
+    
+        const response = await myBackendClient.get(`/users/${id}`);
+    
+        const currentUser = response.data.results || response.data;
         
         if (!currentUser) {
-            throw new Error("Юзера з таким ID не знайдено в загальному списку");
+            throw new Error("Юзера з таким ID не знайдено");
         }
 
         return currentUser; 

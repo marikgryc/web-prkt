@@ -1,94 +1,94 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getActorDetails, IMAGE_BASE_URL } from '../api/tmdbApi';
-import './ActorPage.css';
+import { useParams, Link } from 'react-router-dom';
+import { getActorDetails, getActorCredits, ActorDetails, FilmographyItems } from '../api/creditsApi';
+import './ActorPage.css'; // Переконайтеся, що файл стилів існує
 
-export default function ActorPage() {
+const ActorPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // ДОДАНО: ініціалізація navigate для кліків по фільмах
-
-  const [actor, setActor] = useState<any>(null);
+  const [actor, setActor] = useState<ActorDetails | null>(null);
+  const [filmography, setFilmography] = useState<FilmographyItems[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      // Передаємо id. Якщо він приходить з useParams, це стрічка
-      const data = await getActorDetails(id as string);
-      setActor(data);
-    };
-    fetchData();
-    window.scrollTo(0, 0);
+    if (!id) return;
+    
+    setLoading(true);
+    // Виконуємо два запити паралельно
+    Promise.all([
+      getActorDetails(id),
+      getActorCredits(id)
+    ]).then(([detailsData, creditsData]) => {
+      // Підлаштуйте під те, як ваш бекенд повертає дані (наприклад data.results)
+      setActor(detailsData?.results || detailsData);
+      setFilmography(creditsData?.results || []);
+    }).catch(err => {
+      console.error(err);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, [id]);
 
-  if (!actor) return <div className="loading">Loading...</div>;
+  if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Завантаження...</div>;
+  if (!actor) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Актора не знайдено</div>;
 
   return (
-    
-    <div className="actor-page-container">
-      <div className="actor-card">
+    <div className="actor-page" style={{ padding: '80px', color: 'white', maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="actor-header" style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
         
-        {/* Верхня частина: Фото + Інфо */}
-        <div className="actor-header">
-          <div className="actor-photo-wrapper">
-             <img 
-                // Перевірка: якщо фото немає, показуємо заглушку
-                src={actor.profile_path ? `${IMAGE_BASE_URL}${actor.profile_path}` : 'https://via.placeholder.com/250x350?text=No+Photo'} 
-                alt={actor.name} 
-                className="actor-photo" 
-             />
-          </div>
+        {/* ФОТО АКТОРA */}
+        <div className="actor-photo">
+          <img 
+            src={actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : 'https://via.placeholder.com/300x450?text=No+Photo'} 
+            alt={actor.name} 
+            style={{ width: '300px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.5)' }}
+          />
+        </div>
+
+        {/* ІНФОРМАЦІЯ */}
+        <div className="actor-info" style={{ flex: 1, minWidth: '300px' }}>
+          <h1 style={{ margin: '0 0 10px 0', fontSize: '2.5rem' }}>{actor.name}</h1>
+          <p><strong>Дата народження:</strong> {actor.birthday || 'Невідомо'}</p>
+          {actor.deathday && <p><strong>Дата смерті:</strong> {actor.deathday}</p>}
+          <p><strong>Місце народження:</strong> {actor.place_of_birth || 'Невідомо'}</p>
+          <p><strong>Відомий(а) за:</strong> {actor.known_for_department}</p>
           
-          <div className="actor-info">
-            <h1 className="actor-name">{actor.name}</h1>
-            <button className="btn-follow">Follow</button>
-
-            <div className="info-grid">
-              <div className="info-row">
-                <span className="label">Birthday:</span>
-                <span className="value">{actor.birthday}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">Gender:</span>
-                <span className="value">{actor.gender}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">Popularity:</span>
-                <span className="value">{actor.rating}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">Place of Birth:</span>
-                <span className="value">{actor.place_of_birth}</span>
-              </div>
-              <div className="info-row">
-                <span className="label">Known For:</span>
-                <span className="value">{actor.known_for_department}</span>
-              </div>
-              
-            </div>
+          <div className="actor-bio" style={{ marginTop: '20px' }}>
+            <h3>Біографія</h3>
+            <p style={{ lineHeight: '1.6', color: '#ddd' }}>
+              {actor.biography || 'Біографія відсутня.'}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Біографія */}
-        <div className="section">
-          <h2 className="section-title">Bio</h2>
-          <p className="bio-text">{actor.biography}</p>
-        </div>
-
-        {/* Фільмографія (Known for) - показуємо тільки якщо є елементи */}
-        {actor.known_for && actor.known_for.length > 0 && (
-          <div className="section">
-            <h2 className="section-title">Known for</h2>
-            <div className="known-grid">
-              {actor.known_for.map((movie: any) => (
-                <div key={movie.id} className="known-item" onClick={() => navigate(`/movie/${movie.id}`)}>
-                  <img src={`${IMAGE_BASE_URL}${movie.poster_path}`} alt={movie.title} />
-                  <span className="known-title">{movie.title}</span>
+      {/* ФІЛЬМОГРАФІЯ (згрупована по роках, як віддає ваш бек) */}
+      <div className="actor-filmography" style={{ marginTop: '50px' }}>
+        <h2>Фільмографія</h2>
+        {filmography.length > 0 ? (
+          <div className="filmography-list">
+            {filmography.map((item, index) => (
+              <div key={index} className="filmography-year-group" style={{ marginBottom: '30px' }}>
+                <h3 style={{ borderBottom: '1px solid #444', paddingBottom: '10px' }}>{item.year}</h3>
+                <div className="filmography-grid">
+                  {item.movies.map(movie => (
+                    <Link to={`/movie/${movie.id}`} key={movie.id} style={{ textDecoration: 'none', color: 'inherit', width: '150px' }}>
+                      <img 
+                        src={movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Poster'} 
+                        alt={movie.english_title}
+                      />
+                    <p>{movie.english_title}</p>
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <p>Немає даних про фільми.</p>
         )}
-
       </div>
     </div>
   );
-}
+};
+
+export default ActorPage;

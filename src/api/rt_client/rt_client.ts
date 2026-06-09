@@ -8,8 +8,11 @@ import { useChatStore } from "./app_state";
 import { ChatMessage } from "./message_storage/message_storage";
 import { MessagesManager } from "./managers/messages_manager";
 
-const WS_ADDRESS = (userID: UserID): string =>
-  `${import.meta.env.VITE_WS_URL}/ws/${userID}`;
+const WS_ADDRESS = (userID: UserID): string => {
+  const token = localStorage.getItem('jwt_token'); 
+  const wsBase = import.meta.env.VITE_WS_URL?.replace("ws://", "wss://"); 
+  return `${wsBase}/ws/${userID}?token=${token}`; 
+};
 
 const HTTP_ADDRESS = (chatID: ChatID): string =>
   `${import.meta.env.VITE_API_URL}/chats/${chatID}/messages`;
@@ -113,10 +116,16 @@ class RTClient_ {
 
   public async sendMessage(chatID: ChatID, message: ChatMessage) {
     if(message.message?.length === 0) return;
+    
+    const token = localStorage.getItem('jwt_token'); // ДОДАНО
+
     const resp = await fetch(HTTP_ADDRESS(chatID),
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "" // ДОДАНО: передаємо токен
+        },
         body: JSON.stringify(Makers.makeMessageSendingMessage(message))
       }
     );
@@ -129,6 +138,7 @@ class RTClient_ {
     return data?.results;
   };
 
+  
   public getLastSeenMessageID(chatID: ChatID) {
     const messageID = useChatStore.getState().lastSeenMessageID[chatID];
     return messageID;

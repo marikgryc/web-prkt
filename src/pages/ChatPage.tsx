@@ -70,29 +70,32 @@ export default function ChatPage() {
           }
         });
         
-        if (!response.ok) {
-          console.error("Помилка сервера при отриманні повідомлень:", response.status);
-          return;
-        }
+        if (!response.ok) return;
 
         const data = await response.json();
+        console.log("Повна відповідь сервера:", data); // Це допоможе, якщо структура знову зміниться
         
-        // ГОЛОВНА ЗМІНА: Перевіряємо, чи data.results дійсно є масивом
-        if (data && Array.isArray(data.results)) {
-          const normalized = data.results.map((m: any) => ({
-            ...m,
-            sender_id: m.user_id || m.sender_id,
-            user_id: m.user_id || m.sender_id
-          }));
+        // Перевіряємо, де саме лежить масив повідомлень
+        // Тепер дивимось у data.results.data, як ви показали в логах
+        const messagesArray = data?.results?.data || [];
+        
+        if (Array.isArray(messagesArray)) {
+          const normalized = messagesArray.map((m: any) => {
+            // Якщо повідомлення знову в "content", витягуємо його
+            const msgData = m.content ? m.content : m; 
+            return {
+              ...msgData,
+              sender_id: msgData.user_id || msgData.sender_id,
+              user_id: msgData.user_id || msgData.sender_id
+            };
+          });
           setMessages(normalized);
 
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
           }, 0);
         } else {
-          // Якщо бекенд повернув null або щось інше (наприклад, повідомлень ще немає)
-          console.log("Повідомлень ще немає або нестандартна відповідь сервера:", data);
-          setMessages([]); // Ставимо пустий масив, щоб не ламався UI
+          setMessages([]);
         }
       } catch (error) {
         console.error("Помилка завантаження історії:", error);
@@ -202,12 +205,13 @@ export default function ChatPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !activeChatId) return;
-
+    const currentUserData = JSON.parse(localStorage.getItem('current_user') || '{}');
+    const myRealId = currentUserData.user_id || CURRENT_USER.UID;
     const messageText = inputText.trim();
     const newMessage: ChatMessage = {
       message_id: Date.now(), 
       chat_id: activeChatId,
-      sender_id: CURRENT_USER.UID,
+      sender_id: myRealId, // Замінили CURRENT_USER.UID на myRealId
       message_type: 'text',
       message: messageText,
       timestamp: new Date().toISOString()
@@ -222,12 +226,12 @@ export default function ChatPage() {
     RTClient.send("message", newMessage);
 
     try {
-      const token = localStorage.getItem('jwt_token');
+      const token = localStorage.getItem('jwt_token'); // Отримуємо токен
       const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : ""
+          "Authorization": token ? `Bearer ${token}` : "" // ДОДАЄМО ТОКЕН
         },
         body: JSON.stringify({
           type: "message",
@@ -247,7 +251,6 @@ export default function ChatPage() {
       console.error("Мережева помилка при збереженні повідомлення:", error);
     }
   };
-
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value);
     
@@ -311,7 +314,10 @@ export default function ChatPage() {
 
               <div className="messages-area">
                 {messages.map((msg) => {
-                  const isMine = msg.sender_id === CURRENT_USER.UID || msg.user_id === CURRENT_USER.UID;
+                 const currentUserData = JSON.parse(localStorage.getItem('current_user') || '{}');
+                 const myRealId = currentUserData.user_id || CURRENT_USER.UID;
+                 
+                 const isMine = msg.sender_id === myRealId || msg.user_id === myRealId;
 
                   return (
                     <div 

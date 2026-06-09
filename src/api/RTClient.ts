@@ -1,5 +1,5 @@
 // src/api/RTClient.ts
-
+import { API_URL } from "./API_CONFIG";
 export type MessageType = 
   | "online" 
   | "typing" 
@@ -20,7 +20,7 @@ class RealTimeClient {
     private userId: number | null = null;
     
     // Адреса без подвійних слешів. Беремо формат як у мобілці: /ws/{userID}
-    private BASE_WS_URL = "ws://api.cinelink.lol"; 
+    private BASE_WS_URL = "wss://api.cinelink.lol"; 
 
     // --- ЛОГІКА НАДІЙНОСТІ З МОБІЛЬНОГО КЛІЄНТА ---
     private reconnectAttempts = 0;
@@ -37,7 +37,7 @@ class RealTimeClient {
     public connect(userId?: number) {
         // Якщо ID не передано в аргументах, беремо свіжий з localStorage
         const finalUserId = userId || Number(localStorage.getItem('cinelink_user_id'));
-        
+        const token = localStorage.getItem('jwt_token');
         if (!finalUserId) {
             console.error("Не вдалося підключити WS: ID відсутній");
             return;
@@ -48,7 +48,7 @@ class RealTimeClient {
         }
     
         this.userId = finalUserId;
-        const url = `${this.BASE_WS_URL}/ws/${finalUserId}`;
+        const url = `${this.BASE_WS_URL}/ws/${finalUserId}?token=${token}`;
         console.log("Спроба підключення до WS:", url);
         
         this.ws = new WebSocket(url);

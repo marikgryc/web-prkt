@@ -1,148 +1,166 @@
-.actor-page-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 70px 20px;
-  
-  }
-  
-  /* Центральна картка */
-  .actor-card {
-    background-color: #2b2b2b; /* Темно-сірий фон картки як на скріні */
-    width: 100%;
-    max-width: 900px;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    position: relative;
-    z-index: 10; /* Щоб бути над шумом */
-  }
-  
-  /* --- Header --- */
-  .actor-header {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 40px;
-  }
-  
-  .actor-photo {
-    width: 250px;
-    height: 350px;
-    object-fit: cover;
-    border-radius: 4px; /* Легке заокруглення */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-  
-  .actor-name {
-    font-size: 2.5rem;
-    margin: 0 0 15px 0;
-    color: white;
-    font-weight: 500;
-  }
-  
-  .btn-follow {
-    background-color: #007f5f; /* Зелений Leafy */
-    color: white;
-    border: none;
-    padding: 8px 40px;
-    border-radius: 20px; /* Овальна форма */
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 40px;
-    font-weight: 500;
-    transition: background 0.2s;
-  }
-  
-  .btn-follow:hover {
-    background-color: #10b981;
-  }
-  
-  /* --- Info Grid --- */
-  .info-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .info-row {
-    display: grid;
-    grid-template-columns: 140px 1fr; /* Фіксована ширина для назв */
-    align-items: center;
-  }
-  
-  .label {
-    color: #fca311; /* Жовтий колір (Accent Gold) */
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
-  
-  .value {
-    color: #e5e5e5;
-    font-size: 0.95rem;
-  }
-  
-  /* --- Sections --- */
-  .section-title {
-    color: #fca311; /* Жовтий заголовок */
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    font-weight: 500;
-    border: none; /* Прибираємо рамки, якщо були */
-    padding: 0;
-  }
-  
-  .bio-text {
-    color: #ccc;
-    line-height: 1.6;
-    font-size: 1rem;
-    margin-bottom: 40px;
-  }
-  
-  /* --- Known For Grid --- */
-  .known-grid {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .known-item {
-    width: 120px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .known-item img {
-    width: 100%;
-    border-radius: 8px;
-    transition: transform 0.2s;
-    margin-bottom: 8px;
-  }
-  
-  .known-item img:hover {
-    transform: scale(1.05);
-  }
-  
-  .known-title {
-    color: #fca311; /* Жовтий колір для назв фільмів */
-    font-size: 0.85rem;
-    display: block;
-    line-height: 1.2;
-  }
-  .actor-photo-wrapper {
-  flex-shrink: 0; 
+/* ActorPage.css */
+
+.actor-page {
+  padding: 120px 20px 40px 20px;
+  color: #e0e0e0;
+  max-width: 1200px;
+  margin: 50px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Блок з інформацією про актора (ім'я, кнопка, характеристики) */
+/* --- ВЕРХНЯ ЧАСТИНА (ФОТО + ІНФО) --- */
+.actor-header {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+}
+
+.actor-photo img {
+  width: 300px;
+  max-width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  object-fit: cover;
+}
+
 .actor-info {
-  flex: 1; /* Займає весь вільний простір справа від фото */
+  flex: 1;
+  min-width: 300px;
+}
+
+.actor-info h1 {
+  margin: 0 0 20px 0;
+  font-size: 3rem;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.actor-info p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+  color: #aaaaaa;
+}
+
+.actor-info strong {
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* --- БІОГРАФІЯ --- */
+.actor-bio {
+  margin-top: 40px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.actor-bio h3 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.actor-bio p {
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #cccccc;
+  margin: 0;
+  text-align: justify;
+}
+
+/* --- ФІЛЬМОГРАФІЯ --- */
+.actor-filmography {
+  margin-top: 60px;
+}
+
+.actor-filmography h2 {
+  font-size: 2.2rem;
+  color: #ffffff;
+  margin-bottom: 40px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+}
+
+.filmography-year-group {
+  margin-bottom: 50px;
+}
+
+.filmography-year-group h3 {
+  font-size: 1.8rem;
+  color: #646cff; /* Колір акценту (можете змінити на свій) */
+  margin-bottom: 20px;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.filmography-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+}
+
+/* Картка фільму */
+.movie-card-link {
+  text-decoration: none;
+  color: inherit;
+  width: 160px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  transition: transform 0.3s ease;
 }
 
-/* Відступи для секцій Біографії та Known For */
-.section {
-  margin-top: 40px;
-  border-top: 1px solid #333; /* Легке розділення блоків */
-  padding-top: 20px;
+.movie-card-link:hover {
+  transform: translateY(-8px);
+}
+
+.movie-card-link img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: box-shadow 0.3s ease;
+}
+
+.movie-card-link:hover img {
+  box-shadow: 0 10px 25px rgba(100, 108, 255, 0.4); /* Світіння при наведенні */
+}
+
+.movie-card-link p {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 12px;
+  font-weight: 500;
+  color: #e0e0e0;
+  /* Обрізання довгого тексту до 2 рядків */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- АДАПТИВНІСТЬ (Мобільні пристрої) --- */
+@media (max-width: 768px) {
+  .actor-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .actor-info h1 {
+    font-size: 2.2rem;
+  }
+
+  .actor-bio p {
+    text-align: left;
+  }
+
+  .filmography-grid {
+    justify-content: center;
+  }
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieDetails, getImageUrl, getMovieCredits, getSimilarMovies } from '../api/tmdbApi';
 import MovieRow from '../components/MovieRow'; 
@@ -24,10 +23,6 @@ interface MovieDetails {
   videos?: {
     results: { key: string; type: string; site: string }[];
   };
-  credits?: {
-    cast: CastMember[];
-    crew: { id: number; name: string; job: string }[];
-  };
 }
 
 interface CastMember {
@@ -37,11 +32,20 @@ interface CastMember {
   profile_path: string | null;
 }
 
+interface CrewMember {
+  id: number;
+  name: string;
+  job: string;
+  department: string;
+}
+
 const MoviePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
   const [movie, setMovie] = useState<MovieDetails | null>(null);
   const [cast, setCast] = useState<CastMember[]>([]);
+  const [director, setDirector] = useState<CrewMember | null>(null);
   const [similarMovies, setSimilarMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -50,33 +54,48 @@ const MoviePage: React.FC = () => {
       setLoading(true);
       try {
         if (id) {
-          // ВИПРАВЛЕНО: Додано similarData у деструктуризацію масиву
           const [movieData, creditsData, similarData] = await Promise.all([
             getMovieDetails(Number(id)),
             getMovieCredits(Number(id)),
             getSimilarMovies(Number(id))
           ]);
 
-          setMovie(movieData);
-          setCast(creditsData.slice(0, 12));
-          setSimilarMovies(similarData); 
+       
+          setMovie(movieData?.results || movieData);
+
+          // 2. Безпечно витягуємо акторів (Cast) та знімальну групу (Crew)
+         let actualCast = [];
+          if (Array.isArray(creditsData)) {
+             actualCast = creditsData;
+          } else if (creditsData?.results && Array.isArray(creditsData.results)) {
+             actualCast = creditsData.results;
+          } else if (creditsData?.cast && Array.isArray(creditsData.cast)) {
+             actualCast = creditsData.cast; // Про всяк випадок залишаємо старий варіант
+          }
+
+          setCast(actualCast.slice(0, 15)); // Беремо перших 15 акторів
+          
+          // Режисера у цьому масиві, скоріш за все, немає, тому поки що ставимо null
+          setDirector(null);
+
+          // 3. Схожі фільми
+          setSimilarMovies(similarData?.results || similarData || []);
         }
       } catch (error) {
-        console.error("Помилка завантаження:", error);
+        console.error("Помилка завантаження даних фільму:", error);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // Прокрутка сторінки вгору при зміні фільму
   }, [id]);
 
-  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px'}}>Завантаження...</div>;
-  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px'}}>Фільм не знайдено</div>;
+  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Завантаження...</div>;
+  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Фільм не знайдено</div>;
 
   const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
-  const director = movie.credits?.crew?.find(person => person.job === 'Director');
   const trailer = movie.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
   
   const formatCurrency = (amount?: number) => {
@@ -87,18 +106,19 @@ const MoviePage: React.FC = () => {
   return (
     <div className="movie-page-container">
       <div style={{ height: '70px', width: '100%' }}></div>
+      
       {/* --- HEADER --- */}
       <div className="movie-header">
         <div>
           <h1 className="movie-title">{movie.title}</h1>
           {movie.tagline && <p className="movie-tagline">"{movie.tagline}"</p>}
           <div className="movie-meta-line">
-            {year} • {movie.runtime} хв • {movie.genres?.map(g => g.name).join(', ')}
+            {year} • {movie.runtime || 0} хв • {movie.genres?.map(g => g.name).join(', ')}
           </div>
         </div>
 
         <div className="header-right">
-          <span className="imdb-label">IMDb RATING</span>
+          <span className="imdb-label">RATING</span>
           <div className="imdb-score">
             <span className="star">★</span>
             <span className="score">{(movie.vote_average || 0).toFixed(1)}</span>
@@ -110,7 +130,11 @@ const MoviePage: React.FC = () => {
       {/* --- MEDIA GRID --- */}
       <div className="media-grid">
         <div className="poster-wrapper">
-          <img src={getImageUrl(movie.poster_path)} alt={movie.title} className="main-poster" />
+          <img 
+            src={movie.poster_path ? getImageUrl(movie.poster_path) : 'https://via.placeholder.com/300x450?text=No+Poster'} 
+            alt={movie.title} 
+            className="main-poster" 
+          />
         </div>
         
         <div className="backdrop-wrapper">
@@ -132,11 +156,11 @@ const MoviePage: React.FC = () => {
           <button className="btn-watchlist"><span className="plus">+</span> Add to Watchlist</button>
           
           <div className="movie-details-box">
-            <div className="detail-item"><strong>Status:</strong> {movie.status}</div>
+            <div className="detail-item"><strong>Status:</strong> {movie.status || 'Released'}</div>
             <div className="detail-item"><strong>Director:</strong> {director?.name || 'Unknown'}</div>
             <div className="detail-item"><strong>Budget:</strong> {formatCurrency(movie.budget)}</div>
             <div className="detail-item"><strong>Revenue:</strong> {formatCurrency(movie.revenue)}</div>
-            <div className="detail-item"><strong>Language:</strong> {movie.original_language?.toUpperCase()}</div>
+            <div className="detail-item"><strong>Language:</strong> {movie.original_language?.toUpperCase() || 'EN'}</div>
           </div>
         </div>
       </div>
@@ -153,13 +177,12 @@ const MoviePage: React.FC = () => {
           <h2 className="section-title">Top Cast</h2>
           <div className="cast-scroller">
             {cast.map(actor => (
-              
               <div 
-              key={actor.id} 
-              className="cast-card" 
-              onClick={() => navigate(`/actor/${actor.id}`)}
-              style={{ cursor: 'pointer' }}
-            >
+                key={actor.id} 
+                className="cast-card" 
+                onClick={() => navigate(`/actor/${actor.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="cast-img-wrapper">
                   {actor.profile_path ? (
                     <img src={getImageUrl(actor.profile_path)} alt={actor.name} />
