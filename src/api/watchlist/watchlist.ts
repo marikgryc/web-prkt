@@ -5,7 +5,7 @@ import { WatchlistItem_T, WatchlistCard } from "./types";
 
 // Допоміжна функція для отримання токена (адаптуй під те, як ти зберігаєш JWT на вебі)
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('jwt'); // Або 'access_token', залежить від твого AuthContext
+  const token = localStorage.getItem('jwt_token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
@@ -29,11 +29,23 @@ export async function AddWatchlistItem(item: WatchlistItem_T) {
 
 export async function GetUserWatchlists(userID: number) {
   try {
-    const response = await fetch(`${API_URL}/users/${userID}/watchlists`);
+    const token = localStorage.getItem('jwt_token');
+    const response = await fetch(`/api/users/watchlists`, {  // ← прибрати /${userID}
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Watchlists fetch failed:', response.status);
+      return [];
+    }
+
     const data = await response.json();
-    return data?.results || data; 
+    return data?.results || data;
   } catch (err) {
-    console.error("Помилка GetUserWatchlists:", err);
+    console.error('Помилка GetUserWatchlists:', err);
     return [];
   }
 }
@@ -41,7 +53,13 @@ export async function GetUserWatchlists(userID: number) {
 export async function GetWatchlistMovies(watchlistID: number) {
   try {
     console.log("Fetching movies for watchlist id: ", watchlistID);
-    const response = await fetch(`${API_URL}/watchlists/${watchlistID}`);
+    const token = localStorage.getItem('jwt_token'); 
+    const response = await fetch(`/api/watchlists/${watchlistID}`, {
+      headers: {                                     
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    });
     const data = await response.json();
     return data?.results || data;
   } catch (err) {
@@ -55,7 +73,7 @@ export async function CreateWatchlist(name: string): Promise<boolean> {
   console.log("Creating watchlist for user: ", userID);
   
   try {
-    const response = await fetch(`${API_URL}/users/${userID}/watchlists`, {
+    const response = await fetch(`/api/user/watchlist`, {
       method: "POST",
       headers: { 
         'Content-Type': 'application/json',

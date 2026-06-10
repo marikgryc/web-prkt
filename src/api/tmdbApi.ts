@@ -13,7 +13,7 @@ const tmdbClient = axios.create({
     }
 });
 const myBackendClient = axios.create({
-    baseURL: MY_BACKEND_URL,
+    baseURL: '/api',
     headers: {
         'Content-Type': 'application/json',
        

@@ -204,7 +204,13 @@ const MoviePage: React.FC = () => {
       {similarMovies.length > 0 && (
         <div className="similar-movies-section" style={{ marginTop: '40px' }}>
           <h2 className="section-title">Similar Movies</h2>
-          <MovieRow title="" movies={similarMovies} />
+          <MovieRow 
+              title="" 
+              movies={similarMovies.map(m => ({
+                ...m,
+                vote_average: m.vote_average ?? m.imdb_rating ?? 0
+              }))} 
+            />
         </div>
       )}
     </div>
