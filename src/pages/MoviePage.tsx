@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieDetails, getImageUrl, getMovieCredits, getSimilarMovies } from '../api/tmdbApi';
 import MovieRow from '../components/MovieRow'; 
+import { GetUserWatchlists, AddWatchlistItem } from '../api/watchlist/watchlist';
 import './MoviePage.css';
 
 interface MovieDetails {
@@ -39,6 +40,12 @@ interface CrewMember {
   department: string;
 }
 
+interface WatchlistOption {
+  id: number;
+  name: string;
+  movies_quantity?: number;
+}
+
 const MoviePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -48,6 +55,13 @@ const MoviePage: React.FC = () => {
   const [director, setDirector] = useState<CrewMember | null>(null);
   const [similarMovies, setSimilarMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // --- СЃС‚Р°РЅ РјРѕРґР°Р»РєРё ---
+  const [showModal, setShowModal] = useState(false);
+  const [watchlists, setWatchlists] = useState<WatchlistOption[]>([]);
+  const [loadingWatchlists, setLoadingWatchlists] = useState(false);
+  const [addingTo, setAddingTo] = useState<number | null>(null); // id РІРѕС‚С‡Р»С–СЃС‚Р° С‰Рѕ Р·Р°СЂР°Р· РґРѕРґР°С”С‚СЊСЃСЏ
+  const [addedTo, setAddedTo] = useState<number[]>([]); // id РІРѕС‚С‡Р»С–СЃС‚С–РІ РєСѓРґРё РІР¶Рµ РґРѕРґР°Р»Рё
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,40 +74,69 @@ const MoviePage: React.FC = () => {
             getSimilarMovies(Number(id))
           ]);
 
-       
           setMovie(movieData?.results || movieData);
 
-          // 2. Безпечно витягуємо акторів (Cast) та знімальну групу (Crew)
-         let actualCast = [];
+          let actualCast = [];
           if (Array.isArray(creditsData)) {
-             actualCast = creditsData;
+            actualCast = creditsData;
           } else if (creditsData?.results && Array.isArray(creditsData.results)) {
-             actualCast = creditsData.results;
+            actualCast = creditsData.results;
           } else if (creditsData?.cast && Array.isArray(creditsData.cast)) {
-             actualCast = creditsData.cast; // Про всяк випадок залишаємо старий варіант
+            actualCast = creditsData.cast;
           }
 
-          setCast(actualCast.slice(0, 15)); // Беремо перших 15 акторів
-          
-          // Режисера у цьому масиві, скоріш за все, немає, тому поки що ставимо null
+          setCast(actualCast.slice(0, 15));
           setDirector(null);
-
-          // 3. Схожі фільми
           setSimilarMovies(similarData?.results || similarData || []);
         }
       } catch (error) {
-        console.error("Помилка завантаження даних фільму:", error);
+        console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РґР°РЅРёС… С„С–Р»СЊРјСѓ:", error);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-    window.scrollTo(0, 0); // Прокрутка сторінки вгору при зміні фільму
+    window.scrollTo(0, 0);
   }, [id]);
 
-  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Завантаження...</div>;
-  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Фільм не знайдено</div>;
+  // --- РІС–РґРєСЂРёС‚Рё РјРѕРґР°Р»РєСѓ С– Р·Р°РІР°РЅС‚Р°Р¶РёС‚Рё РІРѕС‚С‡Р»С–СЃС‚Рё ---
+  const handleOpenModal = async () => {
+    setShowModal(true);
+    setAddedTo([]);
+    setLoadingWatchlists(true);
+    try {
+      const userId = Number(localStorage.getItem('cinelink_user_id'));
+      const data = await GetUserWatchlists(userId);
+      setWatchlists(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РІРѕС‚С‡Р»С–СЃС‚С–РІ:', err);
+    } finally {
+      setLoadingWatchlists(false);
+    }
+  };
+
+  // --- РґРѕРґР°С‚Рё С„С–Р»СЊРј Сѓ РІРёР±СЂР°РЅРёР№ РІРѕС‚С‡Р»С–СЃС‚ ---
+  const handleAddToWatchlist = async (watchlistId: number) => {
+    if (!movie) return;
+    setAddingTo(watchlistId);
+    try {
+      const userId = Number(localStorage.getItem('cinelink_user_id'));
+      await AddWatchlistItem({
+        user_id: userId,
+        movie_id: movie.id,
+        watchlist_id: watchlistId,
+      });
+      setAddedTo(prev => [...prev, watchlistId]);
+    } catch (err) {
+      console.error('РџРѕРјРёР»РєР° РґРѕРґР°РІР°РЅРЅСЏ Сѓ РІРѕС‚С‡Р»С–СЃС‚:', err);
+    } finally {
+      setAddingTo(null);
+    }
+  };
+
+  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ...</div>;
+  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Р¤С–Р»СЊРј РЅРµ Р·РЅР°Р№РґРµРЅРѕ</div>;
 
   const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
   const trailer = movie.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
@@ -113,7 +156,7 @@ const MoviePage: React.FC = () => {
           <h1 className="movie-title">{movie.title}</h1>
           {movie.tagline && <p className="movie-tagline">"{movie.tagline}"</p>}
           <div className="movie-meta-line">
-            {year} • {movie.runtime || 0} хв • {movie.genres?.map(g => g.name).join(', ')}
+            {year} {movie.genres?.map(g => g.name).join(', ')}
           </div>
         </div>
 
@@ -153,7 +196,9 @@ const MoviePage: React.FC = () => {
         </div>
 
         <div className="actions-column">
-          <button className="btn-watchlist"><span className="plus">+</span> Add to Watchlist</button>
+          <button className="btn-watchlist" onClick={handleOpenModal}>
+            <span className="plus">+</span> Add to Watchlist
+          </button>
           
           <div className="movie-details-box">
             <div className="detail-item"><strong>Status:</strong> {movie.status || 'Released'}</div>
@@ -168,7 +213,7 @@ const MoviePage: React.FC = () => {
       {/* --- STORYLINE --- */}
       <div className="storyline-section">
           <h2 className="section-title">Storyline</h2>
-          <p className="storyline-text">{movie.overview || "Опис фільму відсутній."}</p>
+          <p className="storyline-text">{movie.overview || "РћРїРёСЃ С„С–Р»СЊРјСѓ РІС–РґСЃСѓС‚РЅС–Р№."}</p>
       </div>
 
       {/* --- TOP CAST --- */}
@@ -204,13 +249,52 @@ const MoviePage: React.FC = () => {
       {similarMovies.length > 0 && (
         <div className="similar-movies-section" style={{ marginTop: '40px' }}>
           <h2 className="section-title">Similar Movies</h2>
-          <MovieRow 
-              title="" 
-              movies={similarMovies.map(m => ({
-                ...m,
-                vote_average: m.vote_average ?? m.imdb_rating ?? 0
-              }))} 
-            />
+          <MovieRow title="" movies={similarMovies} />
+        </div>
+      )}
+
+     
+      {showModal && (
+        <div 
+          className="watchlist-modal-overlay"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+        >
+          <div className="watchlist-modal">
+            <div className="watchlist-modal-header">
+              <h3>Add to Watchlist</h3>
+              <button className="watchlist-modal-close" onClick={() => setShowModal(false)}>X</button>
+            </div>
+
+            <div className="watchlist-modal-body">
+              {loadingWatchlists ? (
+                <p className="watchlist-modal-loading">Loading your lists...</p>
+              ) : watchlists.length === 0 ? (
+                <p className="watchlist-modal-empty">You have no watchlists yet.</p>
+              ) : (
+                watchlists.map(wl => {
+                  const isAdded = addedTo.includes(wl.id);
+                  const isAdding = addingTo === wl.id;
+                  return (
+                    <div key={wl.id} className="watchlist-modal-item">
+                      <div className="watchlist-modal-item-info">
+                        <span className="watchlist-modal-item-name">{wl.name}</span>
+                        <span className="watchlist-modal-item-count">
+                          {wl.movies_quantity ?? 0} films
+                        </span>
+                      </div>
+                      <button
+                        className={`watchlist-modal-add-btn ${isAdded ? 'added' : ''}`}
+                        onClick={() => !isAdded && handleAddToWatchlist(wl.id)}
+                        disabled={isAdding || isAdded}
+                      >
+                        {isAdding ? '...' : isAdded ? '“ Added' : '+ Add'}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

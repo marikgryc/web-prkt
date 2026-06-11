@@ -6,7 +6,7 @@ import { RTClient } from '../api/RTClient';
 import { CURRENT_USER } from '../api/currentUser';
 import { API_URL } from '../api/API_CONFIG';
 import { GetUserChats } from '../api/chats';
-
+import { useAuth } from '../context/AuthContext';
 interface ChatMessage {
   message_id: number;
   chat_id: number;
@@ -63,7 +63,7 @@ export default function ChatPage() {
     const fetchChatHistory = async () => {
       try {
         const token = localStorage.getItem('jwt_token');
-        const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`, {
+        const response = await fetch(`/api/chats/${activeChatId}/messages?cursor=1`, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : ""
@@ -81,14 +81,13 @@ export default function ChatPage() {
         
         if (Array.isArray(messagesArray)) {
           const normalized = messagesArray.map((m: any) => {
-            // Якщо повідомлення знову в "content", витягуємо його
             const msgData = m.content ? m.content : m; 
             return {
               ...msgData,
               sender_id: msgData.user_id || msgData.sender_id,
               user_id: msgData.user_id || msgData.sender_id
             };
-          });
+          }).reverse();
           setMessages(normalized);
 
           setTimeout(() => {
@@ -138,15 +137,14 @@ export default function ChatPage() {
     };
   }, [activeChatId]);
 
+  const { user } = useAuth();
+
   useEffect(() => {
     const fetchContacts = async () => {
-      // Перевіряємо, чи є валідний UID користувача, перш ніж робити запит
-      if (!CURRENT_USER?.UID || CURRENT_USER.UID === 0) {
-        return; 
-      }
-
+      if (!user?.user_id) return;
+      
       try {
-        const chatsData = await GetUserChats(CURRENT_USER.UID);
+        const chatsData = await GetUserChats(user.user_id);
         if (chatsData) {
           const loadedContacts = chatsData.map((chat: any) => {
             const peerId = chat.peer_id?.Valid ? chat.peer_id.Int32 : (chat.peer_id || null);
@@ -167,7 +165,7 @@ export default function ChatPage() {
     };
 
     fetchContacts();
-  }, [CURRENT_USER?.UID]);
+  }, [user?.user_id]);
 
   useEffect(() => {
     RTClient.addGlobalStatusListener((data) => {
@@ -211,7 +209,7 @@ export default function ChatPage() {
     const newMessage: ChatMessage = {
       message_id: Date.now(), 
       chat_id: activeChatId,
-      sender_id: myRealId, // Замінили CURRENT_USER.UID на myRealId
+      user_id: Number(CURRENT_USER.UID),  // ← замість userID
       message_type: 'text',
       message: messageText,
       timestamp: new Date().toISOString()
@@ -227,7 +225,7 @@ export default function ChatPage() {
 
     try {
       const token = localStorage.getItem('jwt_token'); // Отримуємо токен
-      const response = await fetch(`${API_URL}/chats/${activeChatId}/messages`, {
+      const response = await fetch(`/api/chats/${activeChatId}/messages`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -316,8 +314,7 @@ export default function ChatPage() {
                 {messages.map((msg) => {
                  const currentUserData = JSON.parse(localStorage.getItem('current_user') || '{}');
                  const myRealId = currentUserData.user_id || CURRENT_USER.UID;
-                 
-                 const isMine = msg.sender_id === myRealId || msg.user_id === myRealId;
+                 const isMine = msg.sender_id === user?.user_id || msg.user_id === user?.user_id;
 
                   return (
                     <div 

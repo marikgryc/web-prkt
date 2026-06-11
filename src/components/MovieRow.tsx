@@ -36,7 +36,7 @@ export default function MovieRow({ title, movies }: Props) {
             />
             <div className="movie-info">
               <h3 className="movie-name">{movie.title}</h3>
-              <span className="movie-rating">★ {movie.vote_average.toFixed(1)}</span>
+              <span className="movie-rating">★ {(movie.vote_average ?? 0).toFixed(1)}</span>
             </div>
           </div>
         ))}

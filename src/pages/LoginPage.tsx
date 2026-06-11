@@ -13,6 +13,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(username, password);
+      console.log('CURRENT_USER:', CURRENT_USER.UID);
       navigate('/profile'); 
     } catch (error) {
       console.error(error);

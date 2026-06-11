@@ -69,7 +69,7 @@ export class WatchlistsManager extends EntinyManager<Watchlist_T> {
       };
 
       if(!watchlistID)
-        resp = await fetch(`${API_URL}/users/${this.currUserID}/watchlists`, fetchOptions);
+        resp = await fetch(`/api/users/watchlists`, fetchOptions);
       else
         return; 
 

@@ -11,7 +11,7 @@ const getAuthHeaders = () => {
 
 export async function AddWatchlistItem(item: WatchlistItem_T) {
   try {
-    const response = await fetch(`${API_URL}/user/watchlist`, {
+    const response = await fetch(`/api/user/watchlist`, {
       method: "POST",
       headers: { 
         'Content-Type': 'application/json',
