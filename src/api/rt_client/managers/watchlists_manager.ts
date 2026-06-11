@@ -1,4 +1,3 @@
-import { API_URL } from "@/api/API_CONFIG";
 import { UserID, WatchlistID } from "../models/models";
 import { create } from "zustand";
 import { EntinyManager } from "./base_class";

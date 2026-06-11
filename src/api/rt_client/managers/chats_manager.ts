@@ -1,4 +1,3 @@
-import { API_URL } from "@/api/API_CONFIG";
 import { ChatID, EMPTY_ARRAY, EMPTY_OBJECT, UserID } from "../models/models";
 import { create } from "zustand";
 import { EntinyManager } from "./base_class";
@@ -97,7 +96,7 @@ export class ChatsManager extends EntinyManager<Chat_T> {
   public async load(userID: UserID = 0) {
     try {
       const token = localStorage.getItem('jwt_token');
-      const resp = await fetch(`${API_URL}/users/${this.currUserID}/chats`, {
+      const resp = await fetch(`/api/users/${this.currUserID}/chats`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : ''

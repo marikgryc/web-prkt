@@ -1,4 +1,3 @@
-import { API_URL } from "@/api/API_CONFIG";
 import { EMPTY_OBJECT, UserID } from "../models/models";
 import { create } from "zustand";
 import { EntinyManager } from "./base_class";
@@ -85,9 +84,9 @@ export class UsersManager extends EntinyManager<User_T> {
 
       let resp: any;
       if(!userID)
-        resp = await fetch(`${API_URL}/users/init/${this.currUserID}`, fetchOptions);
+        resp = await fetch(`/api/users/init/${this.currUserID}`, fetchOptions);
       else 
-        resp = await fetch(`${API_URL}/users/${userID}`, fetchOptions);
+        resp = await fetch(`/api/users/${userID}`, fetchOptions);
       
       if(!resp.ok){
         const errorText = await resp.text();

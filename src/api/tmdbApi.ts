@@ -3,7 +3,7 @@ export const API_KEY = '9e7bd8c8c4fc2bdc7be7b6739338fe43';
 export const BASE_URL = 'https://api.themoviedb.org/3';
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
-export const MY_BACKEND_URL = 'https://api.cinelink.lol/';
+export const MY_BACKEND_URL = '/api/';
 //http://113.30.191.198:808/
 const tmdbClient = axios.create({
     baseURL: BASE_URL,
@@ -13,7 +13,7 @@ const tmdbClient = axios.create({
     }
 });
 const myBackendClient = axios.create({
-    baseURL: '/api',
+    baseURL: MY_BACKEND_URL,
     headers: {
         'Content-Type': 'application/json',
        
@@ -32,8 +32,6 @@ export interface User {
     bg_img_url?: string;// Додано
     created_at?: string;
     is_active?: boolean;
-    followers_ids?: number[];
-    followings_ids?: number[];
 }
 
 export interface Movie {
@@ -128,7 +126,7 @@ export const getSimilarMovies = async (id: number) => {
 
 export const loginUser = async (loginData: { login: string; password: string }) => {
     try {
-        const response = await axios.post('https://api.cinelink.lol/login', {
+        const response = await axios.post('/api/login', {
             username: loginData.login,
             password: loginData.password
         });
