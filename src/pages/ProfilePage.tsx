@@ -5,30 +5,85 @@ import { getUserProfile, User } from '../api/tmdbApi';
 import { GetUserWatchlists } from '../api/watchlist/watchlist';
 import './ProfilePage.css';
 
-async function getFollowersCount(userID: number): Promise<number> {
+interface FollowUser {
+  user_id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string;
+}
+
+async function fetchFollowers(userID: number): Promise<FollowUser[]> {
   try {
     const token = localStorage.getItem('jwt_token');
     const res = await fetch(`/api/users/${userID}/followers`, {
       headers: { 'Authorization': token ? `Bearer ${token}` : '' }
     });
-    if (!res.ok) return 0;
+    if (!res.ok) return [];
     const data = await res.json();
-    const arr = data?.results || data;
-    return Array.isArray(arr) ? arr.length : 0;
-  } catch { return 0; }
+    return data?.results || [];
+  } catch { return []; }
 }
 
-async function getFollowingsCount(userID: number): Promise<number> {
+async function fetchFollowings(userID: number): Promise<FollowUser[]> {
   try {
     const token = localStorage.getItem('jwt_token');
     const res = await fetch(`/api/users/${userID}/followings`, {
       headers: { 'Authorization': token ? `Bearer ${token}` : '' }
     });
-    if (!res.ok) return 0;
+    if (!res.ok) return [];
     const data = await res.json();
-    const arr = data?.results || data;
-    return Array.isArray(arr) ? arr.length : 0;
-  } catch { return 0; }
+    return data?.results || [];
+  } catch { return []; }
+}
+
+function FollowModal({ 
+  title, 
+  users, 
+  onClose, 
+  onUserClick 
+}: { 
+  title: string; 
+  users: FollowUser[]; 
+  onClose: () => void;
+  onUserClick: (id: number) => void;
+}) {
+  return (
+    <div className="follow-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="follow-modal">
+        <div className="follow-modal-header">
+          <h3>{title}</h3>
+          <button className="follow-modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="follow-modal-body">
+          {users.length === 0 ? (
+            <p className="follow-modal-empty">No users yet</p>
+          ) : (
+            users.map(user => (
+              <div 
+                key={user.user_id} 
+                className="follow-modal-item"
+                onClick={() => { onUserClick(user.user_id); onClose(); }}
+              >
+                <img
+                  src={user.avatar_url || 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'}
+                  alt={user.username}
+                  className="follow-modal-avatar"
+                  onError={(e) => { e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'; }}
+                />
+                <div className="follow-modal-info">
+                  <span className="follow-modal-name">
+                    {user.first_name || user.last_name ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : user.username}
+                  </span>
+                  <span className="follow-modal-handle">@{user.username}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProfilePage() {
@@ -39,8 +94,9 @@ export default function ProfilePage() {
   const [fetching, setFetching] = useState(false);
   const [activeTab, setActiveTab] = useState('Playlist');
   const [watchlists, setWatchlists] = useState<any[]>([]);
-  const [followersCount, setFollowersCount] = useState(0);
-  const [followingsCount, setFollowingsCount] = useState(0);
+  const [followers, setFollowers] = useState<FollowUser[]>([]);
+  const [followings, setFollowings] = useState<FollowUser[]>([]);
+  const [modal, setModal] = useState<'followers' | 'followings' | null>(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -64,41 +120,30 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!profileUser?.user_id) return;
-
-    // Завантажуємо вотчлісти, фоловерів і фоловінгс паралельно
     Promise.all([
       GetUserWatchlists(profileUser.user_id),
-      getFollowersCount(profileUser.user_id),
-      getFollowingsCount(profileUser.user_id),
-    ]).then(([lists, followers, followings]) => {
+      fetchFollowers(profileUser.user_id),
+      fetchFollowings(profileUser.user_id),
+    ]).then(([lists, f, fi]) => {
       if (lists?.length) setWatchlists(lists);
-      setFollowersCount(followers);
-      setFollowingsCount(followings);
+      setFollowers(Array.isArray(f) ? f : []);
+      setFollowings(Array.isArray(fi) ? fi : []);
     });
   }, [profileUser]);
 
-  if (authLoading || fetching) {
-    return <div className="loading-text">Loading profile...</div>;
-  }
-
-  if (!profileUser) {
-    return <div className="loading-text">User not found. Please log in.</div>;
-  }
+  if (authLoading || fetching) return <div className="loading-text">Loading profile...</div>;
+  if (!profileUser) return <div className="loading-text">User not found. Please log in.</div>;
 
   const isMyProfile = currentUser?.user_id === profileUser.user_id;
   const avatarUrl = profileUser.avatar_url || 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png';
   const bgUrl = profileUser.bg_img_url;
-
   const joinDate = profileUser.created_at
     ? new Date(profileUser.created_at).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'Unknown date';
 
   return (
     <div className="profile-page">
-      <div
-        className="profile-cover"
-        style={{ backgroundImage: bgUrl ? `url(${bgUrl})` : undefined }}
-      ></div>
+      <div className="profile-cover" style={{ backgroundImage: bgUrl ? `url(${bgUrl})` : undefined }}></div>
 
       <div className="profile-container">
         <div className="profile-header">
@@ -106,33 +151,26 @@ export default function ProfilePage() {
             src={avatarUrl}
             alt={profileUser.username}
             className="profile-avatar-large"
-            onError={(e) => {
-              e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png';
-            }}
+            onError={(e) => { e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'; }}
           />
 
           <div className="profile-info">
             <div className="profile-names">
-              <h1 className="profile-name">
-                {profileUser.first_name} {profileUser.last_name}
-              </h1>
+              <h1 className="profile-name">{profileUser.first_name} {profileUser.last_name}</h1>
               <p className="profile-handle">@{profileUser.username}</p>
             </div>
 
-            {profileUser.bio && (
-              <div className="profile-bio">{profileUser.bio}</div>
-            )}
+            {profileUser.bio && <div className="profile-bio">{profileUser.bio}</div>}
 
             <span className="profile-joined">Joined {joinDate}</span>
 
             <div className="profile-stats-row">
-              <div className="stat-box">
-                <strong>{followingsCount}</strong> Following
+              <div className="stat-box clickable" onClick={() => setModal('followings')}>
+                <strong>{followings.length}</strong> Following
               </div>
-              <div className="stat-box">
-                <strong>{followersCount}</strong> Followers
+              <div className="stat-box clickable" onClick={() => setModal('followers')}>
+                <strong>{followers.length}</strong> Followers
               </div>
-
               {isMyProfile && (
                 <div className="stat-box logout-btn" onClick={() => { logout(); navigate('/'); }}>
                   Log Out
@@ -163,14 +201,7 @@ export default function ProfilePage() {
                     key={list.id}
                     className="watchlist-card"
                     onClick={() => navigate(`/watchlist/${list.id}`)}
-                    style={{
-                      padding: '15px',
-                      border: '1px solid #ccc',
-                      borderRadius: '8px',
-                      minWidth: '200px',
-                      cursor: 'pointer',
-                      transition: 'transform 0.2s'
-                    }}
+                    style={{ padding: '15px', border: '1px solid #ccc', borderRadius: '8px', minWidth: '200px', cursor: 'pointer', transition: 'transform 0.2s' }}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
@@ -189,6 +220,16 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Модалка */}
+      {modal && (
+        <FollowModal
+          title={modal === 'followers' ? 'Followers' : 'Following'}
+          users={modal === 'followers' ? followers : followings}
+          onClose={() => setModal(null)}
+          onUserClick={(uid) => navigate(`/profile/${uid}`)}
+        />
+      )}
     </div>
   );
 }
