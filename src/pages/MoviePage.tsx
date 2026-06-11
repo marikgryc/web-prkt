@@ -100,7 +100,6 @@ const MoviePage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // --- РІС–РґРєСЂРёС‚Рё РјРѕРґР°Р»РєСѓ С– Р·Р°РІР°РЅС‚Р°Р¶РёС‚Рё РІРѕС‚С‡Р»С–СЃС‚Рё ---
   const handleOpenModal = async () => {
     setShowModal(true);
     setAddedTo([]);
@@ -110,13 +109,11 @@ const MoviePage: React.FC = () => {
       const data = await GetUserWatchlists(userId);
       setWatchlists(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РІРѕС‚С‡Р»С–СЃС‚С–РІ:', err);
     } finally {
       setLoadingWatchlists(false);
     }
   };
 
-  // --- РґРѕРґР°С‚Рё С„С–Р»СЊРј Сѓ РІРёР±СЂР°РЅРёР№ РІРѕС‚С‡Р»С–СЃС‚ ---
   const handleAddToWatchlist = async (watchlistId: number) => {
     if (!movie) return;
     setAddingTo(watchlistId);
@@ -129,7 +126,6 @@ const MoviePage: React.FC = () => {
       });
       setAddedTo(prev => [...prev, watchlistId]);
     } catch (err) {
-      console.error('РџРѕРјРёР»РєР° РґРѕРґР°РІР°РЅРЅСЏ Сѓ РІРѕС‚С‡Р»С–СЃС‚:', err);
     } finally {
       setAddingTo(null);
     }

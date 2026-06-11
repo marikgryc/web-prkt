@@ -32,6 +32,8 @@ export interface User {
     bg_img_url?: string;// Додано
     created_at?: string;
     is_active?: boolean;
+    followers_ids?: number[];
+    followings_ids?: number[];
 }
 
 export interface Movie {
