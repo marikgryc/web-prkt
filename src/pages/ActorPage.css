@@ -1,5 +1,3 @@
-/* ActorPage.css */
-
 .actor-page {
   padding: 120px 20px 40px 20px;
   color: #e0e0e0;
@@ -8,7 +6,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* --- ВЕРХНЯ ЧАСТИНА (ФОТО + ІНФО) --- */
+
 .actor-header {
   display: flex;
   gap: 40px;
@@ -49,7 +47,6 @@
   margin-right: 8px;
 }
 
-/* --- БІОГРАФІЯ --- */
 .actor-bio {
   margin-top: 40px;
   background: rgba(255, 255, 255, 0.03);
@@ -73,7 +70,7 @@
   text-align: justify;
 }
 
-/* --- ФІЛЬМОГРАФІЯ --- */
+
 .actor-filmography {
   margin-top: 60px;
 }
@@ -92,7 +89,7 @@
 
 .filmography-year-group h3 {
   font-size: 1.8rem;
-  color: #646cff; /* Колір акценту (можете змінити на свій) */
+  color: #646cff; 
   margin-bottom: 20px;
   display: inline-block;
   padding-bottom: 5px;
@@ -104,7 +101,6 @@
   gap: 25px;
 }
 
-/* Картка фільму */
 .movie-card-link {
   text-decoration: none;
   color: inherit;
@@ -137,14 +133,12 @@
   margin-top: 12px;
   font-weight: 500;
   color: #e0e0e0;
-  /* Обрізання довгого тексту до 2 рядків */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* --- АДАПТИВНІСТЬ (Мобільні пристрої) --- */
 @media (max-width: 768px) {
   .actor-header {
     flex-direction: column;

@@ -7,7 +7,6 @@ const Footer: React.FC = () => {
     <footer className="site-footer">
       <div className="footer-container">
         
-        {/* Верхня частина: Логотип і Навігація */}
         <div className="footer-top">
           <div className="footer-brand">
             <h2 className="footer-logo">Cinelink</h2>
@@ -23,12 +22,10 @@ const Footer: React.FC = () => {
 
         <div className="footer-divider"></div>
 
-        {/* Нижня частина: КОНТАКТИ (як на твоєму скріншоті) */}
         <div className="footer-bottom">
           <h3 className="footer-heading">КОНТАКТИ</h3>
           
           <div className="contact-grid">
-            {/* Ліва колонка: Телефони */}
             <div className="contact-column">
               <a href="tel:+38077327723" className="contact-item">
                 + 380 (77) 32 77 23

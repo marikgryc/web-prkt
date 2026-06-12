@@ -1,12 +1,12 @@
 /* Загальний контейнер */
 .chat-container {
   display: flex;
-  flex: 1; /* Займає весь доступний простір під шапкою */
-  overflow: hidden; /* Важливо: сам контейнер не гортається */
-  height: calc(100vh - 70px); /* Висота екрана мінус висота вашого Navbar */
+  flex: 1; 
+  overflow: hidden; 
+  height: calc(100vh - 70px); 
 }
   
-  /* Сайдбар з контактами */
+  
   .chat-sidebar {
     width: 300px;
     background-color: #1a1a1a;
@@ -80,7 +80,6 @@
     margin-top: 5px;
   }
   
-  /* Вікно діалогу */
   .chat-window {
     flex: 1;
     display: flex;
@@ -118,7 +117,6 @@
     font-style: italic;
   }
   
-  /* Зона повідомлень */
   .messages-area {
     flex: 1;
     padding: 20px;
@@ -148,7 +146,7 @@
   }
   
   .message-wrapper.sent .message-bubble {
-    background-color: #005C4D; /* Червоний колір Netflix/Cinelink */
+    background-color: #005C4D;
     color: #fff;
     border-bottom-right-radius: 4px;
   }
@@ -226,8 +224,8 @@
     right: 2px;
     width: 12px;
     height: 12px;
-    background-color: #10b981; /* Зелений колір (Emerald) */
-    border: 2px solid #1a1a1a; /* Колір фону, щоб виділялося */
+    background-color: #10b981;
+    border: 2px solid #1a1a1a;
     border-radius: 50%;
   }
   
@@ -246,7 +244,7 @@
     position: relative;
     width: 45px;
     height: 45px;
-    flex-shrink: 0; /* Щоб аватар не стискався */
+    flex-shrink: 0; 
     margin-right: 15px;
   }
   
@@ -257,7 +255,6 @@
     object-fit: cover;
   }
   
-  /* Стиль зеленої крапки */
   .online-indicator {
     position: absolute;
     bottom: 2px;
@@ -270,7 +267,7 @@
     z-index: 2;
   }
   
-  /* Запобігання вильоту тексту за межі панелі */
+ 
   .contact-info {
     display: flex;
     flex-direction: column;
@@ -283,5 +280,5 @@
     color: #888;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Три крапки, якщо текст довгий */
+    text-overflow: ellipsis; 
   }

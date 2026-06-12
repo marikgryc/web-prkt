@@ -73,10 +73,7 @@ export default function ChatPage() {
         if (!response.ok) return;
 
         const data = await response.json();
-        console.log("Повна відповідь сервера:", data); // Це допоможе, якщо структура знову зміниться
-        
-        // Перевіряємо, де саме лежить масив повідомлень
-        // Тепер дивимось у data.results.data, як ви показали в логах
+        console.log("Повна відповідь сервера:", data); 
         const messagesArray = data?.results?.data || [];
         
         if (Array.isArray(messagesArray)) {

@@ -8,7 +8,6 @@ const axiosClient = axios.create({
   },
 });
 
-// Експортуємо константи, які ти використовуєш в інших файлах
 export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 

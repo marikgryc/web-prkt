@@ -53,15 +53,14 @@ export default function HomePage() {
   return (
     <div className="home-container">
       
-      {/* HERO BANNER */}
+  
      {heroMovie && (
   <header 
     className="banner"
     style={{
       backgroundSize: "cover",
-      // Використовуємо BackdropPath для широкого формату
       backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(17,17,17,1) 100%), 
-                        url("${getImageUrl(heroMovie.backdrop_path || heroMovie.poster_path, 'original')}")`,
+      url("${getImageUrl(heroMovie.backdrop_path || heroMovie.poster_path, 'original')}")`,
       backgroundPosition: "center 20%",
     }}
   >
@@ -77,7 +76,6 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Опис (якщо додаси його в структуру на бекенді) */}
       {heroMovie.overview && (
         <h1 className="banner-description">
           {heroMovie.overview.length > 150 
@@ -86,11 +84,11 @@ export default function HomePage() {
         </h1>
       )}
     </div>
-    {/* Градієнт знизу для плавного переходу до списків */}
+
     <div className="banner-fadeBottom" />
   </header>
 )}
-      {/* РЯДКИ ФІЛЬМІВ */}
+    
       <div style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
         {trending.length > 0 && <MovieRow title="Trending Now" movies={trending} />}
         {nowPlaying.length > 0 && <MovieRow title="Now in Cinemas" movies={nowPlaying} />}

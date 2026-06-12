@@ -1,7 +1,6 @@
 import { API_URL } from "@/api/API_CONFIG";
 import { CURRENT_USER } from "@/api/currentUser";
 
-// --- Функція Логіну ---
 export async function LoginRequest(email: string, password: string, navigation: any) {
   console.log("Trying to login");
   try {
@@ -19,7 +18,6 @@ export async function LoginRequest(email: string, password: string, navigation: 
     if (data.code === 200) {
       if (data.data && data.data.user) {
         const user = data.data.user;
-        // Оновлюємо глобальний об'єкт користувача
         if (CURRENT_USER) {
             CURRENT_USER.firstName = user.firstName;
             CURRENT_USER.lastName = user.lastName;
@@ -28,13 +26,9 @@ export async function LoginRequest(email: string, password: string, navigation: 
         }
       }
       
-      // УВАГА: Для веб-версії (React Router) тут краще використовувати шляхи, наприклад '/'
-      // navigation('/profile') замість navigation.replace("HomePageScreen")
-      // Але поки лишаємо як є, щоб не ламати логіку виклику:
       if (navigation && typeof navigation.replace === 'function') {
           navigation.replace("HomePageScreen");
       } else if (typeof navigation === 'function') {
-          // Якщо ви передали navigate hook з react-router-dom
           navigation('/'); 
       }
     }
@@ -49,7 +43,6 @@ export async function LoginRequest(email: string, password: string, navigation: 
   }
 }
 
-// --- Функція Профілю (Винесена назовні) ---
 export async function getUserProfile() {
   return new Promise((resolve) => {
     setTimeout(() => {

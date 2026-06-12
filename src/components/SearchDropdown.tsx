@@ -68,14 +68,12 @@ if (results && results.movies && results.movies.length > 0) {
 
             {isOpen && results && (
                 <div className="search-results-dropdown">
-                    {/* Секція: Фільми */}
+                    
                   {results.movies?.length > 0 && (
     <div className="search-section">
         <div className="search-section-title">Movies</div>
         {results.movies.slice(0, 5).map(movie => {
-            // Визначаємо ID (пробуємо всі варіанти, які є в твоїх структурах)
             const id = movie.id || movie.movie_id;
-            // Визначаємо назву (для фільмів або серіалів)
             const title = movie.title || movie.name;
 
             return (
@@ -96,22 +94,21 @@ if (results && results.movies && results.movies.length > 0) {
             return (rating !== undefined && rating !== null && rating !== 0) 
                 ? Number(rating).toFixed(1) 
                 : 'N/A';
-        })()
-    }
-</span>
+                        })()
+                    }
+                </span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
-                </Link>
-            );
-        })}
-    </div>
-)}
+                )}
 
-                   {/* Секція: Актори */}
                         {results.credits?.length > 0 && (
                             <div className="search-section">
                                 <div className="search-section-title">Actors</div>
                                 {results.credits.slice(0, 3).map(credit => (
-                                    // ВИПРАВЛЕНО: замінили /person/ на /actor/
+                                    
                                     <Link to={`/actor/${credit.credit_id}`} key={credit.credit_id} className="search-result-item" onClick={() => setIsOpen(false)}>
                                         <img src={getImageUrl(credit.profile_path, true)} className="round-img" alt="" />
                                         <span className="search-item-name">{credit.name}</span>
@@ -119,7 +116,7 @@ if (results && results.movies && results.movies.length > 0) {
                                 ))}
                             </div>
                         )}
-                    {/* Секція: Користувачі */}
+                    
                     {results.users?.length > 0 && (
                         <div className="search-section">
                             <div className="search-section-title">Users</div>
@@ -132,7 +129,7 @@ if (results && results.movies && results.movies.length > 0) {
                         </div>
                     )}
 
-                    {/* Порожній результат */}
+                 
                     {!results.movies?.length && !results.users?.length && !results.credits?.length && (
                         <div className="search-no-results">Nothing found 😢</div>
                     )}

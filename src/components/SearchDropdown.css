@@ -1,6 +1,5 @@
-/* Контейнер-обгортка, який ми вставимо в Navbar */
 .search-wrapper {
-  position: absolute; /* Абсолют по центру Navbar */
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
@@ -28,7 +27,7 @@
 
 .search-input-field:focus {
   background: rgba(0, 0, 0, 0.9);
-  border-color: #06530c; /* Червоний акцент */
+  border-color: #06530c; 
 }
 
 .search-loader {
@@ -37,13 +36,12 @@
   font-size: 12px;
 }
 
-/* Випадаючий список */
 .search-results-dropdown {
   position: absolute;
   top: calc(100% + 5px);
   left: 0;
   right: 0;
-  background: #141414; /* Dark mode */
+  background: #141414; 
   border: 1px solid #333;
   border-radius: 4px;
   max-height: 450px;
@@ -109,7 +107,6 @@
   font-size: 14px;
 }
 
-/* Скролбар для dropdown */
 .search-results-dropdown::-webkit-scrollbar {
   width: 6px;
 }

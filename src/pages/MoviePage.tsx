@@ -56,12 +56,12 @@ const MoviePage: React.FC = () => {
   const [similarMovies, setSimilarMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // --- СЃС‚Р°РЅ РјРѕРґР°Р»РєРё ---
+
   const [showModal, setShowModal] = useState(false);
   const [watchlists, setWatchlists] = useState<WatchlistOption[]>([]);
   const [loadingWatchlists, setLoadingWatchlists] = useState(false);
-  const [addingTo, setAddingTo] = useState<number | null>(null); // id РІРѕС‚С‡Р»С–СЃС‚Р° С‰Рѕ Р·Р°СЂР°Р· РґРѕРґР°С”С‚СЊСЃСЏ
-  const [addedTo, setAddedTo] = useState<number[]>([]); // id РІРѕС‚С‡Р»С–СЃС‚С–РІ РєСѓРґРё РІР¶Рµ РґРѕРґР°Р»Рё
+  const [addingTo, setAddingTo] = useState<number | null>(null); 
+  const [addedTo, setAddedTo] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,8 +145,7 @@ const MoviePage: React.FC = () => {
   return (
     <div className="movie-page-container">
       <div style={{ height: '70px', width: '100%' }}></div>
-      
-      {/* --- HEADER --- */}
+  
       <div className="movie-header">
         <div>
           <h1 className="movie-title">{movie.title}</h1>
@@ -166,7 +165,6 @@ const MoviePage: React.FC = () => {
         </div>
       </div>
 
-      {/* --- MEDIA GRID --- */}
       <div className="media-grid">
         <div className="poster-wrapper">
           <img 
@@ -206,13 +204,11 @@ const MoviePage: React.FC = () => {
         </div>
       </div>
 
-      {/* --- STORYLINE --- */}
       <div className="storyline-section">
           <h2 className="section-title">Storyline</h2>
           <p className="storyline-text">{movie.overview || "РћРїРёСЃ С„С–Р»СЊРјСѓ РІС–РґСЃСѓС‚РЅС–Р№."}</p>
       </div>
 
-      {/* --- TOP CAST --- */}
       {cast.length > 0 && (
         <div className="cast-section">
           <h2 className="section-title">Top Cast</h2>
@@ -240,8 +236,7 @@ const MoviePage: React.FC = () => {
           </div>
         </div>
       )}
-      
-      {/* --- SIMILAR MOVIES --- */}
+  
       {similarMovies.length > 0 && (
         <div className="similar-movies-section" style={{ marginTop: '40px' }}>
           <h2 className="section-title">Similar Movies</h2>
@@ -249,7 +244,6 @@ const MoviePage: React.FC = () => {
         </div>
       )}
 
-     
       {showModal && (
         <div 
           className="watchlist-modal-overlay"

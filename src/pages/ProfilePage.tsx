@@ -221,7 +221,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Модалка */}
       {modal && (
         <FollowModal
           title={modal === 'followers' ? 'Followers' : 'Following'}

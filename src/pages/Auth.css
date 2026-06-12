@@ -1,4 +1,4 @@
-/* Загальний контейнер */
+
 .auth-container {
     min-height: 80vh;
     display: flex;
@@ -10,7 +10,6 @@
     overflow: hidden;
   }
   
-  /* Картка */
   .auth-card {
     width: 100%;
     max-width: 520px;
@@ -39,7 +38,6 @@
     line-height: 1.5;
   }
   
-  /* Поля вводу */
   .form-group {
     margin-bottom: 20px;
     text-align: left;
@@ -50,29 +48,27 @@
     color: #ccc;
     font-size: 0.85rem;
     margin-bottom: 8px;
-    margin-left: 2px; /* Трохи змістив лейбл, щоб він був рівно над текстом */
+    margin-left: 2px; 
   }
   
   .form-input {
     width: 100%;
     background: #252525;
     border: 1px solid #333;
-    border-radius: 10px; /* Більш круглі інпути */
+    border-radius: 10px; 
     padding: 14px 16px;
     color: white;
     font-size: 0.95rem;
     outline: none;
     transition: all 0.3s ease;
-    box-sizing: border-box; /* Гарантує, що інпут не вилізе за межі */
+    box-sizing: border-box;
   }
   
   .form-input:focus {
     border-color: #10b981;
     background: #2a2a2a;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); /* Легке світіння при фокусі */
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); 
   }
-  
-  /* Посилання */
   .auth-link {
     color: #aaa;
     font-size: 0.85rem;
@@ -85,12 +81,11 @@
   }
   
   .forgot-wrapper {
-    text-align: right; /* Переніс вправо, як на більшості сайтів (або залиш left, як на макеті) */
+    text-align: right; 
     margin-bottom: 25px;
-    margin-top: -10px; /* Трохи підтягнув до пароля */
+    margin-top: -10px;
   }
   
-  /* Кнопка */
   .auth-btn {
     width: 100%;
     background: #005f40;
@@ -110,7 +105,7 @@
     transform: translateY(-1px);
   }
   
-  /* Розділювач */
+ 
   .divider {
     margin: 30px 0;
     position: relative;
@@ -137,7 +132,6 @@
     z-index: 2;
   }
   
-  /* Соц мережі */
   .social-row {
     display: flex;
     justify-content: center;
@@ -164,7 +158,6 @@
     border-color: #555;
   }
   
-  /* Методи відновлення пароля */
   .method-card {
     background: rgba(255,255,255,0.03);
     border: 1px solid #333;

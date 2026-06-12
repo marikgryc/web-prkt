@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getActorDetails, getActorCredits, ActorDetails, FilmographyItems } from '../api/creditsApi';
-import './ActorPage.css'; // Переконайтеся, що файл стилів існує
-
+import './ActorPage.css';
 const ActorPage = () => {
   const { id } = useParams();
   const [actor, setActor] = useState<ActorDetails | null>(null);
@@ -13,12 +12,10 @@ const ActorPage = () => {
     if (!id) return;
     
     setLoading(true);
-    // Виконуємо два запити паралельно
     Promise.all([
       getActorDetails(id),
       getActorCredits(id)
     ]).then(([detailsData, creditsData]) => {
-      // Підлаштуйте під те, як ваш бекенд повертає дані (наприклад data.results)
       setActor(detailsData?.results || detailsData);
       setFilmography(creditsData?.results || []);
     }).catch(err => {
@@ -35,7 +32,7 @@ const ActorPage = () => {
     <div className="actor-page" style={{ padding: '80px', color: 'white', maxWidth: '1200px', margin: '0 auto' }}>
       <div className="actor-header" style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
         
-        {/* ФОТО АКТОРA */}
+ 
         <div className="actor-photo">
           <img 
             src={actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : 'https://via.placeholder.com/300x450?text=No+Photo'} 
@@ -44,7 +41,7 @@ const ActorPage = () => {
           />
         </div>
 
-        {/* ІНФОРМАЦІЯ */}
+    
         <div className="actor-info" style={{ flex: 1, minWidth: '300px' }}>
           <h1 style={{ margin: '0 0 10px 0', fontSize: '2.5rem' }}>{actor.name}</h1>
           <p><strong>Дата народження:</strong> {actor.birthday || 'Невідомо'}</p>
@@ -61,7 +58,6 @@ const ActorPage = () => {
         </div>
       </div>
 
-      {/* ФІЛЬМОГРАФІЯ (згрупована по роках, як віддає ваш бек) */}
       <div className="actor-filmography" style={{ marginTop: '50px' }}>
         <h2>Фільмографія</h2>
         {filmography.length > 0 ? (

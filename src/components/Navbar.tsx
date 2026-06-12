@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css'; 
 import logo from '../assets/Logo.png';
-// Твій імпорт тут:
 import { SearchDropdown } from '../components/SearchDropdown';
 
 export default function Navbar() {
@@ -27,7 +26,6 @@ export default function Navbar() {
     <div className={`nav ${show && "nav-black"}`}>
       <div className="nav-contents">
         
-        {/* Логотип */}
         <Link to="/">
            <img 
              src={logo} 
@@ -41,7 +39,6 @@ export default function Navbar() {
            {isAuthenticated && <Link to="/chat/3">Chats</Link>}
         </div>
 
-        {/* 👇 ОСЬ ТУТ ДОДАЄМО КОМПОНЕНТ ПОШУКУ 👇 */}
         <SearchDropdown />
 
         {isAuthenticated ? (

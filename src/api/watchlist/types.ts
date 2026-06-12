@@ -1,7 +1,7 @@
 export type WatchlistItem_T = {
   id?: number;
   user_id: number;
-  movie_id: string | number; // Краще дозволити обидва типи, щоб не було проблем з TMDB
+  movie_id: string | number; 
   watchlist_id: number;
 };
 export type WatchlistCard = {

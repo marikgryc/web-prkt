@@ -1,47 +1,41 @@
-/* Основний фон сторінки */
 .profile-page {
     background-color: #121212;
     min-height: 100vh;
     color: white;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* Прибираємо глобальний padding-top, бо тепер у нас є обкладинка */
     padding-bottom: 50px;
 }
 
-/* --- ОБКЛАДИНКА (Background Image) --- */
+
 .profile-cover {
     width: 100%;
-    height: 250px; /* Висота шапки */
-    background: linear-gradient(45deg, #232526, #414345); /* Дефолтний фон */
+    height: 250px; 
+    background: linear-gradient(45deg, #232526, #414345);
     background-size: cover;
     background-position: center;
     position: relative;
 }
 
-/* Контейнер для центрування вмісту (щоб не розлазилось на широких екранах) */
 .profile-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* --- ШАПКА ПРОФІЛЮ --- */
 .profile-header {
     display: flex;
-    flex-direction: column; /* На мобільних - вертикально */
+    flex-direction: column; 
     align-items: flex-start;
     position: relative;
     margin-bottom: 30px;
 }
 
-/* Аватарка */
 .profile-avatar-large {
     width: 140px;
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid #121212; /* Рамка кольору фону сторінки */
-    /* ВАЖЛИВО: піднімаємо аватарку вгору на обкладинку */
+    border: 5px solid #121212; 
     margin-top: -70px; 
     z-index: 2;
 }
@@ -68,14 +62,14 @@
     margin: 2px 0 0 0;
 }
 
-/* --- БІОГРАФІЯ --- */
+
 .profile-bio {
     font-size: 1rem;
     color: #ddd;
     margin-bottom: 15px;
-    max-width: 600px; /* Щоб текст не був занадто широким */
+    max-width: 600px; 
     line-height: 1.5;
-    white-space: pre-wrap; /* Зберігає переноси рядків */
+    white-space: pre-wrap;
 }
 
 .profile-joined {
@@ -85,7 +79,6 @@
     margin-bottom: 20px;
 }
 
-/* Статистика */
 .profile-stats-row {
     display: flex;
     gap: 20px;
@@ -104,14 +97,13 @@
     font-weight: 700;
 }
 
-/* Кнопка виходу */
 .logout-btn {
     border: 1px solid #333;
     padding: 6px 16px;
     border-radius: 20px;
     cursor: pointer;
     transition: 0.2s;
-    margin-left: auto; /* Притискає кнопку вправо */
+    margin-left: auto;
     color: #ff4d4d;
     font-weight: 600;
 }
@@ -121,7 +113,6 @@
     border-color: #ff4d4d;
 }
 
-/* --- ВКЛАДКИ --- */
 .profile-tabs {
     display: flex;
     gap: 30px;
@@ -146,7 +137,6 @@
     color: white;
 }
 
-/* Лінія під активною вкладкою */
 .tab-item.active::after {
     content: '';
     position: absolute;
@@ -154,7 +144,7 @@
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: #4ade80; /* Зелений акцент */
+    background-color: #4ade80; 
     border-radius: 2px;
 }
 
@@ -164,16 +154,15 @@
     padding-top: 100px;
 }
 
-/* Адаптивність для планшетів та ПК */
 @media (min-width: 768px) {
     .profile-header {
-        flex-direction: row; /* Аватар зліва, інфо справа (якщо хочеш такий стиль) */
-        align-items: flex-end; /* Вирівнювання по низу */
+        flex-direction: row; 
+        align-items: flex-end; 
         gap: 30px;
     }
     
     .profile-avatar-large {
-        margin-top: -100px; /* Більший підйом на великих екранах */
+        margin-top: -100px; 
         width: 180px;
         height: 180px;
     }
@@ -184,7 +173,7 @@
     }
 }
 
-/* --- Follow Modal --- */
+
 .stat-box.clickable {
   cursor: pointer;
   transition: opacity 0.2s;

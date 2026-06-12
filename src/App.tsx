@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { AnimatePresence } from 'framer-motion';
@@ -12,29 +12,18 @@ import ProfilePage from './pages/ProfilePage';
 import Footer from './components/Footer';
 import ChatPage from './pages/ChatPage';
 import WatchlistPage from './pages/WatchlistPage';
-import { ChatsManager } from './api/rt_client/managers/chats_manager';
-import { UsersManager } from './api/rt_client/managers/users_manager';
-import { WatchlistsManager } from './api/rt_client/managers/watchlists_manager';
-import { RTClient } from './api/RTClient'
-import { useEffect } from "react";
+import { RTClient } from './api/RTClient';
+import { syncCurrentUser } from './api/currentUser';
+
 function App() {
-
-useEffect(() => {
-    // Беремо ID з того ключа, який ми узгодили раніше
+  useEffect(() => {
     const currentUserID = Number(localStorage.getItem('cinelink_user_id'));
-
     if (currentUserID) {
-      console.log("Initializing Managers for User:", currentUserID);
-      
-      // Ініціалізація синглтонів
-      ChatsManager.getInstance().init(currentUserID);
-      UsersManager.getInstance().init(currentUserID);
-      WatchlistsManager.getInstance().init(currentUserID);
-      
-      // Підключення сокета
+      syncCurrentUser();
       RTClient.connect(currentUserID);
     }
   }, []);
+
   return (
     <div className="app">
       <Navbar />
@@ -43,7 +32,6 @@ useEffect(() => {
           <Route path="/" element={<HomePage />} />
           <Route path="/movie/:id" element={<MoviePage />} />
           <Route path="/actor/:id" element={<ActorPage />} />
-          
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

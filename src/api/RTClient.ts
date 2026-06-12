@@ -19,23 +19,16 @@ class RealTimeClient {
     private ws: WebSocket | null = null;
     private userId: number | null = null;
     
-    // Адреса без подвійних слешів. Беремо формат як у мобілці: /ws/{userID}
     private BASE_WS_URL = "wss://api.cinelink.lol"; 
-
-    // --- ЛОГІКА НАДІЙНОСТІ З МОБІЛЬНОГО КЛІЄНТА ---
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private pingInterval: ReturnType<typeof setInterval> | null = null;
     private messagesQueue: RTMessagePayload[] = []; // Проста черга
-
-    // Колбеки для React
     private onMessageCallbacks: Map<number, (msg: any) => void> = new Map();
     private onTypingCallbacks: Map<number, (msg: any) => void> = new Map();
     private globalStatusCallbacks: ((msg: any) => void)[] = [];
 
-    // --- ПІДКЛЮЧЕННЯ ---
     public connect(userId?: number) {
-        // Якщо ID не передано в аргументах, беремо свіжий з localStorage
         const finalUserId = userId || Number(localStorage.getItem('cinelink_user_id'));
         const token = localStorage.getItem('jwt_token');
         if (!finalUserId) {
@@ -55,15 +48,9 @@ class RealTimeClient {
 
         this.ws.onopen = () => {
             console.log(" WebSocket підключено! User ID:", userId);
-            this.reconnectAttempts = 0; // Скидаємо лічильник
-            
-            // Запускаємо Ping кожні 30 сек
+            this.reconnectAttempts = 0; // Скидаємо лічильник    
             this.startPing();
-
-            // Спершу повідомляємо, що ми онлайн
             this.sendDirect("online", { user_id: userId, is_online: true });
-
-            // Виштовхуємо всі повідомлення, що накопичились у черзі, поки не було зв'язку
             this.flushQueue();
         };
 
@@ -98,8 +85,6 @@ class RealTimeClient {
         }
     }
 
-    // --- АВТОРЕКОНЕКТ ТА PING (Адаптовано з ws_connector.ts) ---
-
     private attemptReconnect() {
         if (this.reconnectAttempts < this.maxReconnectAttempts && this.userId) {
             this.reconnectAttempts++;
@@ -117,7 +102,7 @@ class RealTimeClient {
         this.stopPing();
         this.pingInterval = setInterval(() => {
             this.sendDirect("ping", undefined);
-        }, 30000); // 30 секунд
+        }, 30000); 
     }
 
     private stopPing() {
@@ -127,9 +112,6 @@ class RealTimeClient {
         }
     }
 
-    // --- ЧЕРГА ТА ВІДПРАВКА ---
-
-    // Публічний метод, яким користується React. Якщо немає зв'язку - кладе в чергу
     public send(type: MessageType, content: any) {
         const payload: RTMessagePayload = { type, content };
         
@@ -141,7 +123,6 @@ class RealTimeClient {
         }
     }
 
-    // Пряма відправка (внутрішня) без черги
     private sendDirect(type: MessageType, content: any) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({ type, content }));
@@ -157,11 +138,7 @@ class RealTimeClient {
             this.messagesQueue = []; // Очищаємо чергу
         }
     }
-
-    // --- ОБРОБКА ВХІДНИХ ПОВІДОМЛЕНЬ ---
-
     private handleIncomingEvent(data: RTMessagePayload) {
-        // ігноруємо pong/ping для логів, щоб не спамити консоль
         if (data.type !== 'ping') {
             console.log(" Нове WS повідомлення:", data.type, data.content);
         }
@@ -183,7 +160,6 @@ class RealTimeClient {
         }
     }
 
-    // --- МЕТОДИ ДЛЯ REACT (Підписка) ---
 
     public setOnMessageCallback(chatId: number, callback: (msg: any) => void) {
         this.onMessageCallbacks.set(chatId, callback);

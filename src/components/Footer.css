@@ -1,9 +1,8 @@
-/* Основний контейнер футера */
+
 .site-footer {
-    background-color: #121212; /* Темний фон, як на сторінці профілю */
-    color: #ffffff;
+    background-color: #121212; 
     padding: 60px 0 20px;
-    border-top: 1px solid #333; /* Тонка лінія зверху, щоб відділити від контенту */
+    border-top: 1px solid #333; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   
@@ -13,7 +12,6 @@
     padding: 0 20px;
   }
   
-  /* --- ВЕРХНЯ ЧАСТИНА --- */
   .footer-top {
     display: flex;
     justify-content: space-between;
@@ -26,7 +24,7 @@
   .footer-logo {
     font-size: 1.8rem;
     font-weight: bold;
-    color: #4ade80; /* Зелений акцент (як у профілі) */
+    color: #4ade80;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -51,7 +49,7 @@
   }
   
   .footer-link:hover {
-    color: #4ade80; /* Зелений при наведенні */
+    color: #4ade80; 
   }
   
   /* Розділювач */
@@ -61,7 +59,6 @@
     margin: 20px 0 40px;
   }
   
-  /* --- БЛОК КОНТАКТІВ (Як на скріншоті) --- */
   .footer-bottom {
     margin-bottom: 40px;
   }
@@ -78,7 +75,7 @@
   .contact-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px; /* Відстань між колонками телефонів і пошти */
+    gap: 40px; 
   }
   
   .contact-column {
@@ -103,7 +100,6 @@
     font-size: 0.95rem;
   }
   
-  /* --- КОПІРАЙТ --- */
   .footer-copyright {
     text-align: center;
     font-size: 0.8rem;
@@ -113,7 +109,6 @@
     padding-top: 20px;
   }
   
-  /* Адаптивність для мобільних */
   @media (max-width: 768px) {
     .footer-top {
       flex-direction: column;
