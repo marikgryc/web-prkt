@@ -44,7 +44,7 @@ export default function WatchlistPage() {
           {movies.map((movie) => (
             <div 
               key={movie.movie_id || movie.imdb_id} 
-              onClick={() => navigate(`/movie/${movie.movie_id}`)} // Перехід на сторінку фільму
+              onClick={() => navigate(`/movie/${movie.movie_id}`)}
               style={{ width: '150px', cursor: 'pointer', textAlign: 'center' }}
             >
               <img 

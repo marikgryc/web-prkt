@@ -6,48 +6,33 @@ const Footer: React.FC = () => {
   return (
     <footer className="site-footer">
       <div className="footer-container">
-        
-        <div className="footer-top">
-          <div className="footer-brand">
-            <h2 className="footer-logo">Cinelink</h2>
-            <p className="footer-desc">Твій провідник у світ кіно.</p>
-          </div>
-          
-          <div className="footer-nav">
-            <Link to="/" className="footer-link">Головна</Link>
-            <Link to="/movies" className="footer-link">Фільми</Link>
-            <Link to="/profile" className="footer-link">Профіль</Link>
-          </div>
-        </div>
+
 
         <div className="footer-divider"></div>
 
         <div className="footer-bottom">
-          <h3 className="footer-heading">КОНТАКТИ</h3>
-          
+          <h3 className="footer-heading">Контакти</h3>
+
           <div className="contact-grid">
-            <div className="contact-column">
-              <a href="tel:+38077327723" className="contact-item">
-                + 380 (77) 32 77 23
-              </a>
-              <a href="tel:+38077327723" className="contact-item">
-                + 380 (77) 32 77 23
-              </a>
+            <div className="contact-block">
+              <span className="contact-label">Телефон</span>
+              <a href="tel:+380773277231" className="contact-item">+380 (77) 32 77 23</a>
             </div>
 
-            <div className="contact-column">
-              <a href="mailto:info@yourfishstore.com" className="contact-item">
-                info@cinelink.com
-              </a>
-              <span className="contact-text">
-              вул. Антона Чехова, 20, Коломия, Івано-Франківська область,
-              </span>
+            <div className="contact-block">
+              <span className="contact-label">Email</span>
+              <a href="mailto:info@cinelink.com" className="contact-item">info@cinelink.com</a>
+            </div>
+
+            <div className="contact-block">
+              <span className="contact-label">Адреса</span>
+              <span className="contact-text">вул. Антона Чехова, 20<br />Коломия, Івано-Франківська обл.</span>
             </div>
           </div>
         </div>
 
         <div className="footer-copyright">
-          &copy; {new Date().getFullYear()} Cinelink. All rights reserved.
+          © {new Date().getFullYear()} Cinelink. All rights reserved.
         </div>
 
       </div>

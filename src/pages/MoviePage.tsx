@@ -90,7 +90,7 @@ const MoviePage: React.FC = () => {
           setSimilarMovies(similarData?.results || similarData || []);
         }
       } catch (error) {
-        console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РґР°РЅРёС… С„С–Р»СЊРјСѓ:", error);
+        console.error("", error);
       } finally {
         setLoading(false);
       }
@@ -131,8 +131,8 @@ const MoviePage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ...</div>;
-  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Р¤С–Р»СЊРј РЅРµ Р·РЅР°Р№РґРµРЅРѕ</div>;
+  if (loading) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>Loading</div>;
+  if (!movie) return <div className="movie-page-container" style={{paddingTop: '100px', color: 'white', textAlign: 'center'}}>error</div>;
 
   const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
   const trailer = movie.videos?.results?.find(v => v.type === "Trailer" && v.site === "YouTube");
@@ -206,7 +206,7 @@ const MoviePage: React.FC = () => {
 
       <div className="storyline-section">
           <h2 className="section-title">Storyline</h2>
-          <p className="storyline-text">{movie.overview || "РћРїРёСЃ С„С–Р»СЊРјСѓ РІС–РґСЃСѓС‚РЅС–Р№."}</p>
+          <p className="storyline-text">{movie.overview || ""}</p>
       </div>
 
       {cast.length > 0 && (
