@@ -37,14 +37,23 @@ async function fetchFollowings(userID: number): Promise<FollowUser[]> {
   } catch { return []; }
 }
 
-function FollowModal({ 
-  title, 
-  users, 
-  onClose, 
-  onUserClick 
-}: { 
-  title: string; 
-  users: FollowUser[]; 
+async function getOrCreateChat(friendID: number): Promise<number | null> {
+  try {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`/api/chats/get-or-create/${friendID}`, {
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.results || null;
+  } catch { return null; }
+}
+
+function FollowModal({
+  title, users, onClose, onUserClick
+}: {
+  title: string;
+  users: FollowUser[];
   onClose: () => void;
   onUserClick: (id: number) => void;
 }) {
@@ -60,8 +69,8 @@ function FollowModal({
             <p className="follow-modal-empty">No users yet</p>
           ) : (
             users.map(user => (
-              <div 
-                key={user.user_id} 
+              <div
+                key={user.user_id}
                 className="follow-modal-item"
                 onClick={() => { onUserClick(user.user_id); onClose(); }}
               >
@@ -97,6 +106,7 @@ export default function ProfilePage() {
   const [followers, setFollowers] = useState<FollowUser[]>([]);
   const [followings, setFollowings] = useState<FollowUser[]>([]);
   const [modal, setModal] = useState<'followers' | 'followings' | null>(null);
+  const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -130,6 +140,18 @@ export default function ProfilePage() {
       setFollowings(Array.isArray(fi) ? fi : []);
     });
   }, [profileUser]);
+
+  const handleOpenChat = async () => {
+    if (!profileUser?.user_id) return;
+    setChatLoading(true);
+    const chatId = await getOrCreateChat(profileUser.user_id);
+    setChatLoading(false);
+    if (chatId) {
+      navigate(`/chat/${chatId}`);
+    } else {
+      console.error('Не вдалось створити чат');
+    }
+  };
 
   if (authLoading || fetching) return <div className="loading-text">Loading profile...</div>;
   if (!profileUser) return <div className="loading-text">User not found. Please log in.</div>;
@@ -171,10 +193,19 @@ export default function ProfilePage() {
               <div className="stat-box clickable" onClick={() => setModal('followers')}>
                 <strong>{followers.length}</strong> Followers
               </div>
-              {isMyProfile && (
+
+              {isMyProfile ? (
                 <div className="stat-box logout-btn" onClick={() => { logout(); navigate('/'); }}>
                   Log Out
                 </div>
+              ) : (
+                <button
+                  className="message-btn"
+                  onClick={handleOpenChat}
+                  disabled={chatLoading}
+                >
+                  {chatLoading ? '...' : '✉ Написати'}
+                </button>
               )}
             </div>
           </div>

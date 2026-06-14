@@ -1,4 +1,4 @@
-// src/api/RTClient.ts
+
 import { API_URL } from "./API_CONFIG";
 export type MessageType = 
   | "online" 
@@ -8,11 +8,11 @@ export type MessageType =
   | "page_entering" 
   | "page_leaving" 
   | "message"
-  | "ping"; // Додано ping з мобільного клієнта
+  | "ping"; 
 
 export interface RTMessagePayload {
     type: MessageType;
-    content?: any; // Зробили опціональним, бо ping може не мати контенту
+    content?: any;
 }
 
 class RealTimeClient {
@@ -135,7 +135,7 @@ class RealTimeClient {
             this.messagesQueue.forEach(msg => {
                 this.ws?.send(JSON.stringify(msg));
             });
-            this.messagesQueue = []; // Очищаємо чергу
+            this.messagesQueue = []; 
         }
     }
     private handleIncomingEvent(data: RTMessagePayload) {

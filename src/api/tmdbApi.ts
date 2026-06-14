@@ -122,7 +122,7 @@ export const getSimilarMovies = async (id: number) => {
         return [];
     }
 };
-// --- API ЗАПИТИ ---
+
 
 export const loginUser = async (loginData: { login: string; password: string }) => {
     try {
@@ -188,18 +188,16 @@ export const getUserProfile = async (id: number) => {
 export const getUserById = async (id: number): Promise<User | null> => {
     try {
         const response = await myBackendClient.get(`/users/${id}`);
-        // Твій сервер повертає дані в об'єкті results
+    
         return response.data.results; 
     } catch (error) {
         console.error("Помилка завантаження профілю:", error);
         return null;
     }
 };
-// Це комбінована функція. Для чистого TMDB краще використовувати getTrendingMovies
 export const getPopularMovies = async () => {
     try {
         console.log("📡 Стукаємо за фільмами (TMDB): /movie/popular");
-        // Виправлено шлях: у TMDB це /movie/popular (однина), а не /movies
         const response = await tmdbClient.get('/movie/popular');
 
         console.log("✅ Відповідь сервера фільмів:", response.data);
@@ -228,12 +226,10 @@ export const getGenres = async () => {
     }
 };
 
-// --- ФУНКЦІЇ ДЛЯ TMDB (Головна сторінка) ---
 
 export const getMovieDetails = async (id: number) => {
     const response = await tmdbClient.get(`/movie/${id}`, {
         params: {
-            // Це змусить TMDB докинути масив відео прямо в об'єкт фільму
             append_to_response: 'videos,credits' 
         }
     });
@@ -256,7 +252,6 @@ export const getUpcomingMovies = async () => {
     return response.data;
 };
 
-// Допоміжна функція картинок
 export const getImageUrl = (path: string | null | undefined, size: string = 'w500') => {
     if (!path) {
         return 'https://via.placeholder.com/500x750?text=No+Image';
@@ -264,25 +259,20 @@ export const getImageUrl = (path: string | null | undefined, size: string = 'w50
     return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 export const getMovieCredits = async (id: number) => {
-    // Залежно від того, як у вас налаштований axios, шлях може трохи відрізнятися
-    // Але зазвичай це: /movie/{id}/credits
+   
     const response = await tmdbClient.get(`/movie/${id}/credits`);
     return response.data.cast;
 };
 export const getActorDetails = async (id: number | string) => {
     try {
-        // Робимо запит до твого бекенду за кредитом (актором/персоналом)
         const response = await myBackendClient.get(`/credits/${id}`);
         
-        // Згідно з новою структурою, дані знаходяться у results.details
         const details = response.data.results.details;
 
-        // Перетворюємо числове значення статі на текстове (1 - жінка, 2 - чоловік, 0 - невідомо)
         let genderText = 'Невідомо';
         if (details.gender === 1) genderText = 'Жінка';
         else if (details.gender === 2) genderText = 'Чоловік';
 
-        // Повертаємо об'єкт у форматі, якого очікує компонент ActorPage
         return {
             id: details.id,
             name: details.name,
@@ -306,10 +296,8 @@ export const fetchGlobalSearch = async (query: string): Promise<SearchResults> =
       const safeQuery = encodeURIComponent(query.trim());
       const response = await myBackendClient.get(`/search/${safeQuery}`);
       
-      // Дістаємо загальний масив результатів (той самий, де лежить Shrek)
       const itemsArray = response.data?.results?.results || [];
   
-      // Створюємо порожню структуру, яку очікує твій SearchDropdown
       const groupedResults: SearchResults = {
         movies: [],
         users: [],
@@ -317,7 +305,6 @@ export const fetchGlobalSearch = async (query: string): Promise<SearchResults> =
         watchlists: []
       };
   
-      // Сортуємо результати по їхньому "type"
       if (Array.isArray(itemsArray)) {
         itemsArray.forEach((item: any) => {
           if (item.type === 'movies') groupedResults.movies!.push(item);
@@ -327,7 +314,6 @@ export const fetchGlobalSearch = async (query: string): Promise<SearchResults> =
         });
       }
   
-      // Віддаємо розсортовані дані у компонент
       return groupedResults; 
       
     } catch (error) {
