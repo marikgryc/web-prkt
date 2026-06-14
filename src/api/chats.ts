@@ -5,7 +5,7 @@ const getAuthHeaders = () => {
 
 export async function GetUserChats(userID: number) {
   try {
-    const response = await fetch(`/api/users/${userID}/chats`, {
+    const response = await fetch(`/api/users/chats`, {
       headers: getAuthHeaders()
     });
     if (!response.ok) {

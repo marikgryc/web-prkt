@@ -49,6 +49,32 @@ async function getOrCreateChat(friendID: number): Promise<number | null> {
   } catch { return null; }
 }
 
+async function createWatchlist(name: string): Promise<boolean> {
+  try {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch('/api/users/watchlists', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      },
+      body: JSON.stringify({ name, is_public: true })
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+async function deleteWatchlist(userID: number, watchlistID: number): Promise<boolean> {
+  try {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`/api/users/${userID}/watchlists/${watchlistID}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
 function FollowModal({
   title, users, onClose, onUserClick
 }: {
@@ -69,15 +95,11 @@ function FollowModal({
             <p className="follow-modal-empty">No users yet</p>
           ) : (
             users.map(user => (
-              <div
-                key={user.user_id}
-                className="follow-modal-item"
-                onClick={() => { onUserClick(user.user_id); onClose(); }}
-              >
+              <div key={user.user_id} className="follow-modal-item"
+                onClick={() => { onUserClick(user.user_id); onClose(); }}>
                 <img
                   src={user.avatar_url || 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'}
-                  alt={user.username}
-                  className="follow-modal-avatar"
+                  alt={user.username} className="follow-modal-avatar"
                   onError={(e) => { e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'; }}
                 />
                 <div className="follow-modal-info">
@@ -95,6 +117,48 @@ function FollowModal({
   );
 }
 
+function CreateWatchlistModal({ onClose, onCreate }: { onClose: () => void; onCreate: (name: string) => void }) {
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!name.trim()) return;
+    setLoading(true);
+    await onCreate(name.trim());
+    setLoading(false);
+  };
+
+  return (
+    <div className="follow-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="follow-modal">
+        <div className="follow-modal-header">
+          <h3>Новий список</h3>
+          <button className="follow-modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="follow-modal-body" style={{ padding: '20px' }}>
+          <input
+            type="text"
+            placeholder="Назва списку..."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+            className="watchlist-name-input"
+            autoFocus
+          />
+          <button
+            className="message-btn"
+            onClick={handleSubmit}
+            disabled={loading || !name.trim()}
+            style={{ marginTop: '12px', width: '100%' }}
+          >
+            {loading ? 'Створення...' : 'Створити'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, loading: authLoading, logout } = useAuth();
@@ -105,7 +169,7 @@ export default function ProfilePage() {
   const [watchlists, setWatchlists] = useState<any[]>([]);
   const [followers, setFollowers] = useState<FollowUser[]>([]);
   const [followings, setFollowings] = useState<FollowUser[]>([]);
-  const [modal, setModal] = useState<'followers' | 'followings' | null>(null);
+  const [modal, setModal] = useState<'followers' | 'followings' | 'create' | null>(null);
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
@@ -146,10 +210,25 @@ export default function ProfilePage() {
     setChatLoading(true);
     const chatId = await getOrCreateChat(profileUser.user_id);
     setChatLoading(false);
-    if (chatId) {
-      navigate(`/chat/${chatId}`);
-    } else {
-      console.error('Не вдалось створити чат');
+    if (chatId) navigate(`/chat/${chatId}`);
+  };
+
+  const handleCreateWatchlist = async (name: string) => {
+    const ok = await createWatchlist(name);
+    if (ok) {
+      setModal(null);
+      // Перезавантажити список
+      const lists = await GetUserWatchlists(profileUser!.user_id);
+      if (lists?.length) setWatchlists(lists);
+    }
+  };
+
+  const handleDeleteWatchlist = async (e: React.MouseEvent, watchlistID: number) => {
+    e.stopPropagation();
+    if (!profileUser?.user_id) return;
+    const ok = await deleteWatchlist(profileUser.user_id, watchlistID);
+    if (ok) {
+      setWatchlists(prev => prev.filter(w => w.id !== watchlistID));
     }
   };
 
@@ -169,23 +248,16 @@ export default function ProfilePage() {
 
       <div className="profile-container">
         <div className="profile-header">
-          <img
-            src={avatarUrl}
-            alt={profileUser.username}
-            className="profile-avatar-large"
-            onError={(e) => { e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'; }}
-          />
+          <img src={avatarUrl} alt={profileUser.username} className="profile-avatar-large"
+            onError={(e) => { e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'; }} />
 
           <div className="profile-info">
             <div className="profile-names">
               <h1 className="profile-name">{profileUser.first_name} {profileUser.last_name}</h1>
               <p className="profile-handle">@{profileUser.username}</p>
             </div>
-
             {profileUser.bio && <div className="profile-bio">{profileUser.bio}</div>}
-
             <span className="profile-joined">Joined {joinDate}</span>
-
             <div className="profile-stats-row">
               <div className="stat-box clickable" onClick={() => setModal('followings')}>
                 <strong>{followings.length}</strong> Following
@@ -193,17 +265,12 @@ export default function ProfilePage() {
               <div className="stat-box clickable" onClick={() => setModal('followers')}>
                 <strong>{followers.length}</strong> Followers
               </div>
-
               {isMyProfile ? (
                 <div className="stat-box logout-btn" onClick={() => { logout(); navigate('/'); }}>
                   Log Out
                 </div>
               ) : (
-                <button
-                  className="message-btn"
-                  onClick={handleOpenChat}
-                  disabled={chatLoading}
-                >
+                <button className="message-btn" onClick={handleOpenChat} disabled={chatLoading}>
                   {chatLoading ? '...' : '✉ Написати'}
                 </button>
               )}
@@ -213,36 +280,38 @@ export default function ProfilePage() {
 
         <div className="profile-tabs">
           {['Posts', 'Playlist', 'Saved stories', 'Wishlist'].map((tab) => (
-            <button
-              key={tab}
-              className={`tab-item ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
+            <button key={tab} className={`tab-item ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}>{tab}</button>
           ))}
         </div>
 
         <div className="posts-section">
           {activeTab === 'Playlist' ? (
-            <div className="watchlists-container" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '20px' }}>
-              {watchlists.length > 0 ? (
-                watchlists.map(list => (
-                  <div
-                    key={list.id}
-                    className="watchlist-card"
-                    onClick={() => navigate(`/watchlist/${list.id}`)}
-                    style={{ padding: '15px', border: '1px solid #ccc', borderRadius: '8px', minWidth: '200px', cursor: 'pointer', transition: 'transform 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  >
-                    <h4 style={{ margin: '0 0 10px 0' }}>{list.name}</h4>
-                    <p style={{ margin: 0, color: '#666' }}>Кількість фільмів: {list.movies_quantity || 0}</p>
-                  </div>
-                ))
-              ) : (
-                <div style={{ color: '#666', fontSize: '1.1rem' }}>Немає збережених списків.</div>
+            <div>
+              {isMyProfile && (
+                <button className="create-watchlist-btn" onClick={() => setModal('create')}>
+                  + Новий список
+                </button>
               )}
+              <div className="watchlists-container">
+                {watchlists.length > 0 ? (
+                  watchlists.map(list => (
+                    <div key={list.id} className="watchlist-card" onClick={() => navigate(`/watchlist/${list.id}`)}>
+                      <div className="watchlist-card-header">
+                        <h4>{list.name}</h4>
+                        {isMyProfile && (
+                          <button className="watchlist-delete-btn"
+                            onClick={(e) => handleDeleteWatchlist(e, list.id)}
+                            title="Видалити">✕</button>
+                        )}
+                      </div>
+                      <p>Фільмів: {list.movies_quantity || 0}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="watchlist-empty">Немає збережених списків.</div>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ color: '#666', fontSize: '1.2rem', marginTop: '20px' }}>
@@ -252,12 +321,19 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {modal && (
+      {(modal === 'followers' || modal === 'followings') && (
         <FollowModal
           title={modal === 'followers' ? 'Followers' : 'Following'}
           users={modal === 'followers' ? followers : followings}
           onClose={() => setModal(null)}
           onUserClick={(uid) => navigate(`/profile/${uid}`)}
+        />
+      )}
+
+      {modal === 'create' && (
+        <CreateWatchlistModal
+          onClose={() => setModal(null)}
+          onCreate={handleCreateWatchlist}
         />
       )}
     </div>
