@@ -121,9 +121,9 @@ if (results && results.movies && results.movies.length > 0) {
                         <div className="search-section">
                             <div className="search-section-title">Users</div>
                             {results.users.slice(0, 3).map(user => (
-                                <Link to={`/user/${user.user_id}`} key={user.user_id} className="search-result-item" onClick={() => setIsOpen(false)}>
+                                <Link to={`/profile/${user.user_id}`} key={user.user_id} className="search-result-item" onClick={() => setIsOpen(false)}>
                                     <img src={getImageUrl(user.avatar_url, true)} className="round-img" alt="" />
-                                    <span className="search-item-name">@{user.username}</span>
+                                    <div className="search-item-info"><span className="search-item-name">{user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}</span><span className="search-item-meta">@{user.username}</span></div>
                                 </Link>
                             ))}
                         </div>
