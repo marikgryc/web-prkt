@@ -88,7 +88,6 @@ export interface WatchlistSearch {
 myBackendClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('jwt_token');
     if (token) {
-        // Найчастіше бекенд очікує формат "Bearer <token>", але спитайте бекендера, чи потрібно слово Bearer
         config.headers.Authorization = `Bearer ${token}`; 
     }
     return config;
@@ -96,7 +95,6 @@ myBackendClient.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// Головна структура відповіді
 export interface SearchResults {
   movies: MovieSearchItem[] | null;
   users: UserSearch[] | null;
@@ -106,7 +104,6 @@ export interface SearchResults {
 export const fetchMovieOfTheDay = async () => {
   try {
     const response = await myBackendClient.get('/movie_of_the_day');
-    // Повертаємо саме об'єкт results, як вказано в твоїй структурі
     return response.data.results; 
   } catch (error) {
     console.error("Error fetching movie of the day:", error);
@@ -202,7 +199,7 @@ export const getPopularMovies = async () => {
 
         console.log("✅ Відповідь сервера фільмів:", response.data);
 
-        const serverData = response.data.results; // TMDB повертає results
+        const serverData = response.data.results; 
 
         if (Array.isArray(serverData) && serverData.length > 0) {
             return { results: serverData };

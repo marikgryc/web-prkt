@@ -23,7 +23,7 @@ class RealTimeClient {
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private pingInterval: ReturnType<typeof setInterval> | null = null;
-    private messagesQueue: RTMessagePayload[] = []; // Проста черга
+    private messagesQueue: RTMessagePayload[] = []; 
     private onMessageCallbacks: Map<number, (msg: any) => void> = new Map();
     private onTypingCallbacks: Map<number, (msg: any) => void> = new Map();
     private globalStatusCallbacks: ((msg: any) => void)[] = [];
@@ -48,7 +48,7 @@ class RealTimeClient {
 
         this.ws.onopen = () => {
             console.log(" WebSocket підключено! User ID:", userId);
-            this.reconnectAttempts = 0; // Скидаємо лічильник    
+            this.reconnectAttempts = 0; 
             this.startPing();
             this.sendDirect("online", { user_id: userId, is_online: true });
             this.flushQueue();

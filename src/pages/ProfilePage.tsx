@@ -165,7 +165,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [fetching, setFetching] = useState(false);
-  const [activeTab, setActiveTab] = useState('Playlist');
+  const [activeTab, setActiveTab] = useState('Watchlist');
   const [watchlists, setWatchlists] = useState<any[]>([]);
   const [followers, setFollowers] = useState<FollowUser[]>([]);
   const [followings, setFollowings] = useState<FollowUser[]>([]);
@@ -279,14 +279,14 @@ export default function ProfilePage() {
         </div>
 
         <div className="profile-tabs">
-          {['Posts', 'Playlist', 'Saved stories', 'Wishlist'].map((tab) => (
+          {['Posts', 'Watchlist', 'Saved stories', 'Wishlist'].map((tab) => (
             <button key={tab} className={`tab-item ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}>{tab}</button>
           ))}
         </div>
 
         <div className="posts-section">
-          {activeTab === 'Playlist' ? (
+          {activeTab === 'Watchlist' ? (
             <div>
               {isMyProfile && (
                 <button className="create-watchlist-btn" onClick={() => setModal('create')}>

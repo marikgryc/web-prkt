@@ -206,7 +206,7 @@ export default function ChatPage() {
     const newMessage: ChatMessage = {
       message_id: Date.now(), 
       chat_id: activeChatId,
-      user_id: Number(CURRENT_USER.UID),  // ← замість userID
+      user_id: Number(CURRENT_USER.UID),  
       message_type: 'text',
       message: messageText,
       timestamp: new Date().toISOString()
