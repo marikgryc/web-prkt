@@ -112,7 +112,7 @@ export const fetchMovieOfTheDay = async () => {
 };
 export const getSimilarMovies = async (id: number) => {
     try {
-        const response = await myBackendClient.get(`/movies/${id}/similar`);
+        const response = await myBackendClient.get(`/movies/${id}/similar?page=1`);
         return response.data.results || [];
     } catch (error) {
         console.error("Error fetching similar movies:", error);

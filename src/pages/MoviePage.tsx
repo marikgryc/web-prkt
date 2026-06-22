@@ -87,10 +87,16 @@ const MoviePage: React.FC = () => {
 
           setCast(actualCast.slice(0, 15));
           setDirector(null);
-          setSimilarMovies(similarData?.results || similarData || []);
+          const actualSimilar = similarData?.results?.movies || similarData?.movies || [];     
+          const safeSimilar = actualSimilar.map((m: any) => ({
+            ...m,
+            vote_average: m.vote_average ?? m.imdb_rating ?? 0
+          }));
+
+          setSimilarMovies(safeSimilar);
         }
       } catch (error) {
-        console.error("", error);
+        console.error("Fetch error:", error);
       } finally {
         setLoading(false);
       }

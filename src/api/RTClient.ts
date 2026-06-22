@@ -19,7 +19,7 @@ class RealTimeClient {
     private ws: WebSocket | null = null;
     private userId: number | null = null;
     
-    private BASE_WS_URL = "wss://api.cinelink.lol"; 
+    private BASE_WS_URL = "wss://cinelink.lol"; 
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private pingInterval: ReturnType<typeof setInterval> | null = null;
