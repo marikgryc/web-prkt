@@ -221,12 +221,12 @@ export default function ChatPage() {
     RTClient.send("message", newMessage);
 
     try {
-      const token = localStorage.getItem('jwt_token'); // Отримуємо токен
+      const token = localStorage.getItem('jwt_token');
       const response = await fetch(`/api/chats/${activeChatId}/messages`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "" // ДОДАЄМО ТОКЕН
+          "Authorization": token ? `Bearer ${token}` : "" 
         },
         body: JSON.stringify({
           type: "message",

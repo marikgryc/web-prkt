@@ -3,11 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './Auth.css';
 
-// 👇 ІМПОРТУЄМО КАРТИНКИ З ПАПКИ ASSETS
-// (Перевір, щоб назви файлів збігалися з тими, що у тебе в папці!)
-import emailIcon from '../assets/Mail.png'; 
-import phoneIcon from '../assets/Phone.png';
-
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState(1);
   const [method, setMethod] = useState<'email' | 'phone'>('email');
@@ -26,7 +21,6 @@ export default function ForgotPasswordPage() {
           <>
             <p className="auth-subtitle">Please select option to send link reset password</p>
             
-            {/* --- Вибір Email --- */}
             <div 
                 className={`method-card ${method === 'email' ? 'active' : ''}`}
                 onClick={() => setMethod('email')}
@@ -44,7 +38,6 @@ export default function ForgotPasswordPage() {
                 </div>
             </div>
 
-            {/* --- Вибір Телефону --- */}
             <div 
                 className={`method-card ${method === 'phone' ? 'active' : ''}`}
                 onClick={() => setMethod('phone')}
@@ -68,7 +61,6 @@ export default function ForgotPasswordPage() {
           </>
         ) : (
           <>
-             {/* Введення даних */}
              <p className="auth-subtitle">Enter your {method === 'email' ? 'email' : 'phone number'}</p>
              
              <div className="form-group">

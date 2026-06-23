@@ -46,7 +46,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Успішна реєстрація — переходимо на логін
       navigate('/login', { state: { registered: true } });
 
     } catch (err) {

@@ -5,7 +5,6 @@
     color: white;
   }
   
-  /* --- Header --- */
   .movie-header {
     display: flex;
     justify-content: space-between;
@@ -51,10 +50,8 @@
   .score { font-weight: bold; color: white; }
   .max-score { font-size: 1rem; color: #777; }
   
-  /* --- Media Grid (3 Columns) --- */
   .media-grid {
       display: grid;
-      /* Постер (фікс) | Бекдроп (тягнеться) | Сайдбар (фікс) */
       grid-template-columns: 280px 1fr 260px; 
       gap: 10px;
       height: 400px; 
@@ -127,7 +124,6 @@
       cursor: pointer;
   }
   
-  /* --- Details Section --- */
   .genres-list {
       display: flex;
       gap: 10px;
@@ -170,7 +166,6 @@
   
   .credit-value:hover { text-decoration: underline; }
   
-  /* --- Photos & Storyline --- */
   .section-title {
       color: #005f40; 
       font-size: 1.8rem;
@@ -242,7 +237,6 @@
     scrollbar-color: #555 #222;
 }
 
-/* Стилізація скролбару для Chrome/Safari */
 .cast-scroller::-webkit-scrollbar {
     height: 8px;
 }
@@ -254,10 +248,9 @@
     border-radius: 4px;
 }
 
-/* Картка актора */
 .cast-card {
-    flex: 0 0 140px; /* Фіксована ширина картки */
-    background-color: #1f1f1f; /* Трохи світліше за фон сторінки */
+    flex: 0 0 140px;
+    background-color: #1f1f1f;
     border-radius: 4px;
     overflow: hidden;
     display: flex;
@@ -329,7 +322,7 @@
 }
 
 .detail-item strong {
-    color: #005f40; /* IMDb жовтий */
+    color: #005f40;
     margin-right: 5px;
 }
 

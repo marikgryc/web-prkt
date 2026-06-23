@@ -62,7 +62,7 @@ export interface UserSearch {
 }
 
 export interface MovieSearchItem {
-  id?: number; // Зверни увагу, бекенд віддає 'id' замість 'movie_id' у пошуку
+  id?: number; 
   title?: string;
   poster_path?: string;
   profile_path?: string;
@@ -194,10 +194,10 @@ export const getUserById = async (id: number): Promise<User | null> => {
 };
 export const getPopularMovies = async () => {
     try {
-        console.log("📡 Стукаємо за фільмами (TMDB): /movie/popular");
+        console.log("фільми (TMDB): /movie/popular");
         const response = await tmdbClient.get('/movie/popular');
 
-        console.log("✅ Відповідь сервера фільмів:", response.data);
+        console.log("Відповідь сервера фільмів:", response.data);
 
         const serverData = response.data.results; 
 
@@ -205,18 +205,18 @@ export const getPopularMovies = async () => {
             return { results: serverData };
         }
 
-        console.warn("⚠️ Сервер дав пустий список.");
+        console.warn("Сервер дав пустий список.");
         return { results: MOCK_MOVIES };
 
     } catch (error) {
-        console.error("❌ Помилка API фільмів. Використовуємо MOCK_MOVIES.", error);
+        console.error("Помилка API фільмів. Використовуємо MOCK_MOVIES.", error);
         return { results: MOCK_MOVIES };
     }
 };
 
 export const getGenres = async () => {
     try {
-        const response = await tmdbClient.get('/genre/movie/list'); // Виправлено шлях для TMDB
+        const response = await tmdbClient.get('/genre/movie/list'); 
         return response.data;
     } catch (error) {
         return { genres: [] };
@@ -277,7 +277,7 @@ export const getActorDetails = async (id: number | string) => {
             profile_path: details.profile_path,
             birthday: details.birthday || "Немає даних",
             gender: genderText,
-            rating: details.popularity || "Немає даних", // Використовуємо popularity замість rating
+            rating: details.popularity || "Немає даних", 
             place_of_birth: details.place_of_birth || "Немає даних",
             
             known_for_department: details.known_for_department || "Немає даних",

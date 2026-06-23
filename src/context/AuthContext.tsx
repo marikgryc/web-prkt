@@ -13,7 +13,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Retry з затримкою — для 503 (бекенд "прокидається")
 async function fetchWithRetry<T>(
   fn: () => Promise<T>,
   retries = 3,
@@ -26,7 +25,7 @@ async function fetchWithRetry<T>(
       const status = err?.response?.status ?? err?.status;
       const isLastAttempt = i === retries - 1;
       if (status === 503 && !isLastAttempt) {
-        console.warn(`503 — бекенд недоступний, спроба ${i + 2}/${retries} через ${delayMs / 1000}с...`);
+        console.warn(`бекенд недоступний, спроба ${i + 2}/${retries} через ${delayMs / 1000}с...`);
         await new Promise(res => setTimeout(res, delayMs));
       } else {
         throw err;

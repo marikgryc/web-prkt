@@ -124,7 +124,7 @@
 }
 
 .movie-card-link:hover img {
-  box-shadow: 0 10px 25px rgba(100, 108, 255, 0.4); /* Світіння при наведенні */
+  box-shadow: 0 10px 25px rgba(100, 108, 255, 0.4);
 }
 
 .movie-card-link p {
